@@ -1,0 +1,11 @@
+{
+  "master": {
+    "id": 1
+  },
+  "slaves": [],
+  "xboxId": 0,
+  "aSetPoint": 0.0,
+  "bSetPoint": 0.0,
+  "xSetPoint": 0.0,
+  "ySetPoint": 0.0
+}
