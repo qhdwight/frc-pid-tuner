@@ -1,5 +1,6 @@
 package team8.tuner;
 
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANError;
 import com.revrobotics.CANPIDController.AccelStrategy;
 import com.revrobotics.CANPIDController.ArbFFUnits;
@@ -24,6 +25,7 @@ public class Robot extends TimedRobot {
 
     private Config m_Config;
     private CANSparkMax m_Master;
+    private CANEncoder m_MasterEncoder;
     private List<CANSparkMax> m_Slaves;
     private XboxController m_Controller;
 
@@ -44,11 +46,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-        m_Config = C.get(Config.class);
+        CSVWriter.init();
+        m_Config = C.readGenericConfig(Config.class);
         m_Controller = new XboxController(m_Config.xboxId);
+        System.out.printf("Using X-Box controller with id: %d%n", m_Config.xboxId);
         // Master
         ifValid(m_Master, CANSparkMax::close);
         m_Master = setupMaster(m_Config.master);
+        m_MasterEncoder = m_Master.getEncoder();
         // Slaves
         ifValid(m_Slaves, slaves -> slaves.forEach(CANSparkMax::close));
         m_Slaves = m_Config.slaves.stream()
@@ -66,21 +71,31 @@ public class Robot extends TimedRobot {
             setSetPoint(m_Config.xSetPoint);
         } else if (m_Controller.getYButtonPressed()) {
             setSetPoint(m_Config.ySetPoint);
+        } else if (m_Controller.getBackButtonPressed()) {
+            m_Master.disable();
+            System.out.println("Disabling...");
         }
+        CSVWriter.addData("current", m_Master.getOutputCurrent() + m_Slaves.get(0).getOutputCurrent());
+        CSVWriter.addData("output", m_Master.getAppliedOutput());
+        CSVWriter.addData("position", m_MasterEncoder.getPosition());
+        CSVWriter.addData("velocity", m_MasterEncoder.getVelocity());
     }
 
     @Override
     public void disabledInit() {
         ifValid(m_Master, CANSparkMax::disable);
         ifValid(m_Slaves, slaves -> slaves.forEach(CANSparkMax::disable));
+        CSVWriter.write();
     }
 
     private void setSetPoint(double setPoint) {
+        System.out.printf("Setting set point to %s with ff %s%n", setPoint, m_Config.master.ff);
         m_Master.getPIDController().setReference(setPoint, ControlType.kSmartMotion, PID_SLOT_ID, m_Config.master.ff, ArbFFUnits.kPercentOut);
     }
 
     private CANSparkMax setupSpark(int id) {
         final var spark = new CANSparkMax(id, MotorType.kBrushless);
+        System.out.printf("Setup spark with id %d%n", id);
         check(spark.restoreFactoryDefaults());
         check(spark.getEncoder().setPosition(0.0));
         return spark;
@@ -101,6 +116,7 @@ public class Robot extends TimedRobot {
         check(spark.enableVoltageCompensation(config.voltageCompensation));
         check(spark.setClosedLoopRampRate(config.ramp));
         final var controller = spark.getPIDController();
+        System.out.printf("Using gains %nP: %s %nI: %s %nD: %s %nF: %s%n%nV: %s %nA: %s%n", config.p, config.i, config.d, config.f, config.v, config.a);
         check(controller.setP(config.p, PID_SLOT_ID));
         check(controller.setI(config.i, PID_SLOT_ID));
         check(controller.setD(config.d, PID_SLOT_ID));
@@ -131,11 +147,13 @@ public class Robot extends TimedRobot {
 
     private void check(final CANError error) {
         if (error != CANError.kOk) {
-            final var message = "Failed to set!";
+            final var message = String.format("Failed to set! Error: %s", error);
             System.err.println(message);
             throw new RuntimeException(message);
         }
     }
+
+
 
     private void scoldUser() {
         System.err.println("Use test mode!");

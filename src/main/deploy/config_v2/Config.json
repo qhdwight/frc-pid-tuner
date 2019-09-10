@@ -3,14 +3,16 @@
         "id": 3,
         "voltageCompensation": 11,
         "positionConversion": 1.3720253714818562,
-        "velocityConversion": 0.012147491593880535
+        "velocityConversion": 0.012147491593880535,
+        "ff": -0.04,
+        "f": 0.017
     },
     "slaves": [
         {
             "id": 12
         }
     ],
-    "xboxId": 0,
+    "xboxId": 2,
     "aSetPoint": 0.0,
     "bSetPoint": -10.0,
     "xSetPoint": -20.0,

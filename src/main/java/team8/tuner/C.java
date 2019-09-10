@@ -83,7 +83,7 @@ public class C {
         return Paths.get(CONFIG_FOLDER.toString(), String.format("%s.json", configClass.getSimpleName())).toFile();
     }
 
-    private static <T> T readGenericConfig(Class<T> configClass) {
+    public static <T> T readGenericConfig(Class<T> configClass) {
         File configFile = getFileForConfig(configClass);
         String configClassName = configClass.getSimpleName();
         if (!configFile.exists()) {
