@@ -26,7 +26,7 @@ public class C {
 
     private static final Path CONFIG_FOLDER = RobotBase.isReal()
             ? Paths.get(Filesystem.getDeployDirectory().toString(), "config_v2")
-            : Paths.get(Filesystem.getOperatingDirectory().toString(), "src", "main", "deploy", "config_v2");
+            : Paths.get(Filesystem.getLaunchDirectory().toString(), "src", "main", "deploy", "config_v2");
     private static Class[] sConfigs = new Class[]{Config.class};
     private static ObjectMapper sMapper = new ObjectMapper();
     private static Map<String, Class<?>> sNameToClass = new HashMap<>(sConfigs.length);

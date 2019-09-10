@@ -56,10 +56,6 @@ public class Robot extends TimedRobot {
                 .collect(Collectors.toList());
     }
 
-    private void setSetPoint(double setPoint) {
-        m_Master.getPIDController().setReference(setPoint, ControlType.kSmartMotion, PID_SLOT_ID, m_Config.master.ff, ArbFFUnits.kPercentOut);
-    }
-
     @Override
     public void testPeriodic() {
         if (m_Controller.getAButtonPressed()) {
@@ -79,9 +75,14 @@ public class Robot extends TimedRobot {
         ifValid(m_Slaves, slaves -> slaves.forEach(CANSparkMax::disable));
     }
 
-    private CANSparkMax createSpark(int id) {
+    private void setSetPoint(double setPoint) {
+        m_Master.getPIDController().setReference(setPoint, ControlType.kSmartMotion, PID_SLOT_ID, m_Config.master.ff, ArbFFUnits.kPercentOut);
+    }
+
+    private CANSparkMax setupSpark(int id) {
         final var spark = new CANSparkMax(id, MotorType.kBrushless);
         check(spark.restoreFactoryDefaults());
+        check(spark.getEncoder().setPosition(0.0));
         return spark;
     }
 
@@ -92,7 +93,7 @@ public class Robot extends TimedRobot {
     }
 
     private CANSparkMax setupMaster(final MasterSparkConfig config) {
-        final var spark = createSpark(config.id);
+        final var spark = setupSpark(config.id);
         configureLimit(spark, SoftLimitDirection.kForward, config.forwardLimit);
         configureLimit(spark, SoftLimitDirection.kReverse, config.reverseLimit);
         spark.setInverted(config.isInverted);
@@ -118,7 +119,7 @@ public class Robot extends TimedRobot {
     }
 
     private CANSparkMax setupSlave(final SparkConfig config, final CANSparkMax master) {
-        final var spark = createSpark(config.id);
+        final var spark = setupSpark(config.id);
         check(spark.setIdleMode(master.getIdleMode()));
         check(spark.follow(master, config.isInverted));
         return spark;
