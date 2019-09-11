@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import team8.tuner.Config.MasterSparkConfig;
@@ -28,10 +29,12 @@ public class Robot extends TimedRobot {
     private CANEncoder m_MasterEncoder;
     private List<CANSparkMax> m_Slaves;
     private XboxController m_Controller;
+    private PowerDistributionPanel pdp;
 
     @Override
     public void robotInit() {
         System.out.printf("Initializing PID tuner with:%n%s%n", C.getJson(Config.class));
+        pdp = new PowerDistributionPanel(0);
     }
 
     @Override
@@ -75,22 +78,29 @@ public class Robot extends TimedRobot {
             m_Master.disable();
             System.out.println("Disabling...");
         }
-        CSVWriter.addData("current", m_Master.getOutputCurrent() + m_Slaves.get(0).getOutputCurrent());
-        CSVWriter.addData("output", m_Master.getAppliedOutput());
-        CSVWriter.addData("position", m_MasterEncoder.getPosition());
-        CSVWriter.addData("velocity", m_MasterEncoder.getVelocity());
+        if (m_Config.writeCsv) {
+            pdp.getTotalCurrent();
+            CSVWriter.addData("totalCurrent", pdp.getTotalCurrent());
+            CSVWriter.addData("current", m_Master.getOutputCurrent() + m_Slaves.get(0).getOutputCurrent());
+            CSVWriter.addData("output", m_Master.getAppliedOutput());
+            CSVWriter.addData("position", m_MasterEncoder.getPosition());
+            CSVWriter.addData("velocity", m_MasterEncoder.getVelocity());
+        }
     }
 
     @Override
     public void disabledInit() {
         ifValid(m_Master, CANSparkMax::disable);
         ifValid(m_Slaves, slaves -> slaves.forEach(CANSparkMax::disable));
-        CSVWriter.write();
+        ifValid(m_Config, config -> {
+            if (m_Config.writeCsv) CSVWriter.write();
+        });
     }
 
     private void setSetPoint(double setPoint) {
         System.out.printf("Setting set point to %s with ff %s%n", setPoint, m_Config.master.ff);
-        m_Master.getPIDController().setReference(setPoint, ControlType.kSmartMotion, PID_SLOT_ID, m_Config.master.ff, ArbFFUnits.kPercentOut);
+        check(m_Master.getPIDController().setReference(setPoint, ControlType.kSmartMotion, PID_SLOT_ID, m_Config.master.ff, ArbFFUnits.kPercentOut));
+//        m_Master.getPIDController().setReference(setPoint, ControlType.kSmartMotion, PID_SLOT_ID, m_Config.master.ff * 12);
     }
 
     private CANSparkMax setupSpark(int id) {
@@ -152,8 +162,6 @@ public class Robot extends TimedRobot {
             throw new RuntimeException(message);
         }
     }
-
-
 
     private void scoldUser() {
         System.err.println("Use test mode!");

@@ -5,7 +5,9 @@
         "positionConversion": 1.3720253714818562,
         "velocityConversion": 0.012147491593880535,
         "ff": -0.04,
-        "f": 0.017
+        "f": 0.015,
+        "a": 12,
+        "v": 12
     },
     "slaves": [
         {

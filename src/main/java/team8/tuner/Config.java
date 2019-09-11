@@ -20,5 +20,6 @@ class Config extends AbstractConfig {
     public ArrayList<SparkConfig> slaves = new ArrayList<>();
 
     public int xboxId;
+    public boolean writeCsv = true;
     public double aSetPoint, bSetPoint, xSetPoint, ySetPoint;
 }
