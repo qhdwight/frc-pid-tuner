@@ -9,7 +9,8 @@ class Config extends AbstractConfig {
     }
 
     public static class MasterSparkConfig extends SparkConfig {
-        public double ramp, p, i, d, f, ff, a, v;
+        public double ramp, p, i, d, f, ff, a, v, armComOffset;
+        public Double armFf;
         public double voltageCompensation = 12.0;
         public double positionConversion = 1.0, velocityConversion = 1.0;
         public Float forwardLimit, reverseLimit;
