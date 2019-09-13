@@ -1,14 +1,12 @@
 package team8.tuner;
 
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANError;
+import com.revrobotics.*;
 import com.revrobotics.CANPIDController.AccelStrategy;
 import com.revrobotics.CANPIDController.ArbFFUnits;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.ControlType;
+import com.revrobotics.CANDigitalInput.LimitSwitchPolarity;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -56,6 +54,8 @@ public class Robot extends TimedRobot {
         // Master
         ifValid(m_Master, CANSparkMax::close);
         m_Master = setupMaster(m_Config.master);
+        check(m_Master.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyClosed).enableLimitSwitch(false));
+        check(m_Master.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyOpen).enableLimitSwitch(false));
         m_MasterEncoder = m_Master.getEncoder();
         // Slaves
         ifValid(m_Slaves, slaves -> slaves.forEach(CANSparkMax::close));
@@ -135,12 +135,13 @@ public class Robot extends TimedRobot {
         check(controller.setOutputRange(-1.0, 1.0, PID_SLOT_ID));
         check(controller.setSmartMotionMaxAccel(config.a, PID_SLOT_ID));
         check(controller.setSmartMotionMaxVelocity(config.v, PID_SLOT_ID));
-        check(controller.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, PID_SLOT_ID));
-        check(controller.setSmartMotionAllowedClosedLoopError(0.0, PID_SLOT_ID));
-        check(controller.setSmartMotionMinOutputVelocity(0.0, PID_SLOT_ID));
-        final var encoder = spark.getEncoder();
-        check(encoder.setPositionConversionFactor(config.positionConversion));
-        check(encoder.setVelocityConversionFactor(config.velocityConversion));
+        check(controller.setSmartMotionAccelStrategy(AccelStrategy.kSCurve, PID_SLOT_ID));
+        check(controller.setSmartMotionAllowedClosedLoopError(1.0, PID_SLOT_ID));
+        check(controller.setSmartMotionMinOutputVelocity(0.0, PID_SLOT_ID), "Min");
+        spark.setClosedLoopRampRate(0.2);
+//        final var encoder = spark.getEncoder();
+//        check(encoder.setPositionConversionFactor(config.positionConversion));
+//        check(encoder.setVelocityConversionFactor(config.velocityConversion));
         return spark;
     }
 
@@ -158,6 +159,14 @@ public class Robot extends TimedRobot {
     private void check(final CANError error) {
         if (error != CANError.kOk) {
             final var message = String.format("Failed to set! Error: %s", error);
+            System.err.println(message);
+            throw new RuntimeException(message);
+        }
+    }
+
+    private void check(final CANError error, final String name) {
+        if (error != CANError.kOk) {
+            final var message = String.format("Failed to set %s! Error: %s", name, error);
             System.err.println(message);
             throw new RuntimeException(message);
         }

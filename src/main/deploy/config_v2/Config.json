@@ -1,13 +1,15 @@
 {
     "master": {
         "id": 3,
-        "voltageCompensation": 11,
+        "voltageCompensation": 12,
         "positionConversion": 1.3720253714818562,
         "velocityConversion": 0.012147491593880535,
-        "ff": -0.04,
-        "f": 0.015,
-        "a": 12,
-        "v": 12
+        "ff": 0.031,
+        "f": 0.00022,
+        "p": 0.00005,
+        "a": 5200,
+        "v": 4000,
+        "isInverted": true
     },
     "slaves": [
         {
@@ -16,7 +18,7 @@
     ],
     "xboxId": 2,
     "aSetPoint": 0.0,
-    "bSetPoint": -10.0,
-    "xSetPoint": -20.0,
-    "ySetPoint": -30.0
+    "bSetPoint": 15.0,
+    "xSetPoint": 30.0,
+    "ySetPoint": 50.0
 }
