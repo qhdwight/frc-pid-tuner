@@ -1,4 +1,4 @@
-package team8.tuner;
+package team8.tuner.configv2;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -29,11 +29,9 @@ public class C {
             : Paths.get(Filesystem.getLaunchDirectory().toString(), "src", "main", "deploy", "config_v2");
     private static Class[] sConfigs = new Class[]{Config.class};
     private static ObjectMapper sMapper = new ObjectMapper();
-    private static Map<String, Class<?>> sNameToClass = new HashMap<>(sConfigs.length);
     private static Map<Class<?>, Object> sConfigMap = new HashMap<>(sConfigs.length) {{
         for (Class<?> configClass : sConfigs) {
             put(configClass, readGenericConfig(configClass));
-            sNameToClass.put(configClass.getSimpleName(), configClass);
         }
     }};
 

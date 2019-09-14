@@ -7,11 +7,15 @@ import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import team8.tuner.Config.MasterSparkConfig;
-import team8.tuner.Config.SparkConfig;
+import team8.tuner.configv2.C;
+import team8.tuner.configv2.Config;
+import team8.tuner.configv2.Config.MasterSparkConfig;
+import team8.tuner.configv2.Config.SparkConfig;
+import team8.tuner.csv.CSVWriter;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,10 +25,11 @@ import java.util.stream.Collectors;
 public class Robot extends TimedRobot {
 
     enum ControlMode {
-        DISABLED, SET_POINT
+        DISABLED, SMART_MOTION, VELOCITY
     }
 
     private static final int PID_SLOT_ID = 0;
+    private static final double JOYSTICK_THRESHOLD = 0.07;
 
     private Config m_Config;
     private CANSparkMax m_Master;
@@ -33,7 +38,7 @@ public class Robot extends TimedRobot {
     private List<CANSparkMax> m_Slaves;
     private XboxController m_Controller;
     private PowerDistributionPanel m_PowerDistributionPanel;
-    private double m_SetPoint;
+    private double m_SetPoint, m_Velocity;
     private ControlMode m_ControlMode = ControlMode.DISABLED;
 
     @Override
@@ -74,7 +79,7 @@ public class Robot extends TimedRobot {
 
     private void setSetPoint(double setPoint) {
         m_SetPoint = setPoint;
-        m_ControlMode = ControlMode.SET_POINT;
+        m_ControlMode = ControlMode.SMART_MOTION;
     }
 
     @Override
@@ -91,6 +96,14 @@ public class Robot extends TimedRobot {
         } else if (m_Controller.getBackButtonPressed()) {
             m_ControlMode = ControlMode.DISABLED;
             System.out.println("Disabling...");
+        } else {
+            double input = m_Controller.getY(Hand.kRight);
+            if (Math.abs(input) > JOYSTICK_THRESHOLD) {
+                m_Velocity = input;
+                m_ControlMode = ControlMode.VELOCITY;
+            } else {
+                m_Velocity = 0.0;
+            }
         }
         /* CSV Data */
         if (m_Config.writeCsv) {
@@ -102,15 +115,30 @@ public class Robot extends TimedRobot {
         }
         /* Sending output to controllers */
         switch (m_ControlMode) {
-            case SET_POINT:
+            case SMART_MOTION:
+            case VELOCITY:
                 double arbitraryFeedForward = m_Config.master.ff;
                 final double convertedPosition = m_MasterEncoder.getPosition() * m_Config.master.positionConversion;
                 if (m_Config.master.armFf != null) {
                     arbitraryFeedForward += m_Config.master.armFf * Math.cos(Math.toRadians(convertedPosition - m_Config.master.armComOffset));
                 }
+                double reference;
+                ControlType controlType;
+                switch (m_ControlMode) {
+                    case SMART_MOTION:
+                        reference = m_SetPoint / m_Config.master.positionConversion;
+                        controlType = ControlType.kSmartMotion;
+                        break;
+                    case VELOCITY:
+                        reference = m_Velocity / m_Config.master.velocityConversion;
+                        controlType = ControlType.kVelocity;
+                        break;
+                    default:
+                        throw new RuntimeException();
+                }
                 m_MasterController.setReference(
-                        m_SetPoint / m_Config.master.positionConversion,
-                        ControlType.kSmartMotion, PID_SLOT_ID,
+                        reference,
+                        controlType, PID_SLOT_ID,
                         arbitraryFeedForward, ArbFFUnits.kPercentOut
                 );
                 break;
@@ -138,7 +166,7 @@ public class Robot extends TimedRobot {
         return spark;
     }
 
-    private void configureLimit(final CANSparkMax spark, final SoftLimitDirection direction, final Float configLimit) {
+    private void configureSoftLimit(final CANSparkMax spark, final SoftLimitDirection direction, final Float configLimit) {
         final var limit = Optional.ofNullable(configLimit);
         check(spark.enableSoftLimit(direction, limit.isPresent()), "enable soft limit");
         limit.ifPresent(softLimit -> check(spark.setSoftLimit(direction, softLimit), "set soft limit"));
@@ -146,8 +174,8 @@ public class Robot extends TimedRobot {
 
     private CANSparkMax setupMaster(final MasterSparkConfig config) {
         final var spark = setupSpark(config.id);
-        configureLimit(spark, SoftLimitDirection.kForward, config.forwardLimit);
-        configureLimit(spark, SoftLimitDirection.kReverse, config.reverseLimit);
+        configureSoftLimit(spark, SoftLimitDirection.kForward, config.forwardLimit);
+        configureSoftLimit(spark, SoftLimitDirection.kReverse, config.reverseLimit);
         spark.setInverted(config.isInverted);
         check(spark.setIdleMode(config.isBraked ? IdleMode.kBrake : IdleMode.kCoast), "idle mode");
         check(spark.enableVoltageCompensation(config.voltageCompensation), "voltage compensation");
@@ -172,17 +200,13 @@ public class Robot extends TimedRobot {
 
     private CANSparkMax setupSlave(final SparkConfig config, final CANSparkMax master) {
         final var spark = setupSpark(config.id);
-        check(spark.setIdleMode(master.getIdleMode()));
+        check(spark.setIdleMode(master.getIdleMode()), "idle mode");
         check(spark.follow(master, config.isInverted), "follow inverted");
         return spark;
     }
 
     private <T> void ifValid(final T object, final Consumer<T> action) {
         Optional.ofNullable(object).ifPresent(action);
-    }
-
-    private void check(final CANError error) {
-        check(error, "Unknown");
     }
 
     private void check(final CANError error, final String name) {

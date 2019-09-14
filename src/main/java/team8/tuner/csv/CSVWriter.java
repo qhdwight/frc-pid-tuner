@@ -1,4 +1,4 @@
-package team8.tuner;
+package team8.tuner.csv;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -24,7 +24,7 @@ public class CSVWriter {
     private static Long sStartTime;
 
     public static void init() {
-        sCsvFile.delete();
+        if (!sCsvFile.delete()) System.err.println("Failed to delete existing CSV file!");
         sStartTime = System.currentTimeMillis();
     }
 
@@ -46,7 +46,7 @@ public class CSVWriter {
         addData(key, getTime(), builder -> builder.append(value));
     }
 
-    public static void addData(String key, double value) {
+    static void addData(String key, double value) {
         addData(key, getTime(), builder -> builder.append(value));
     }
 

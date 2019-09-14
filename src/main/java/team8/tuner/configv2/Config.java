@@ -1,8 +1,8 @@
-package team8.tuner;
+package team8.tuner.configv2;
 
 import java.util.ArrayList;
 
-class Config extends AbstractConfig {
+public class Config extends AbstractConfig {
     public static class SparkConfig {
         public int id;
         public boolean isInverted;
