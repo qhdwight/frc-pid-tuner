@@ -131,7 +131,7 @@ public class Robot extends TimedRobot {
                         break;
                     case VELOCITY:
                         reference = m_Velocity / m_Config.master.velocityConversion;
-                        controlType = ControlType.kVelocity;
+                        controlType = ControlType.kSmartVelocity;
                         break;
                     default:
                         throw new RuntimeException();
