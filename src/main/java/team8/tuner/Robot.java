@@ -93,7 +93,10 @@ public class Robot extends TimedRobot {
             setSetPoint(m_Config.xSetPoint);
         } else if (m_Input.getYButtonPressed()) {
             setSetPoint(m_Config.ySetPoint);
-        } else if (m_Input.getBackButtonPressed()) {
+        } else if (m_Input.getBumperPressed(Hand.kRight)) {
+            m_ControlMode = ControlMode.PERCENT_OUTPUT;
+            m_PercentOutput = 0.25;
+        } else if (m_Input.getBumperPressed(Hand.kLeft)) {
             m_ControlMode = ControlMode.DISABLED;
             System.out.println("Disabling...");
         } else {
@@ -117,27 +120,27 @@ public class Robot extends TimedRobot {
             CSVWriter.addData("totalCurrent", m_PowerDistributionPanel.getTotalCurrent());
             CSVWriter.addData("sparkCurrent", m_Master.getOutputCurrent() + m_Slaves.get(0).getOutputCurrent());
             CSVWriter.addData("output", m_Master.getAppliedOutput());
-            CSVWriter.addData("position", m_MasterEncoder.getPosition() * m_Config.master.positionConversion);
-            CSVWriter.addData("velocity", m_MasterEncoder.getVelocity() * m_Config.master.velocityConversion);
+            CSVWriter.addData("position", m_MasterEncoder.getPosition());
+            CSVWriter.addData("velocity", m_MasterEncoder.getVelocity());
         }
         /* Sending output to controllers */
         switch (m_ControlMode) {
             case SMART_MOTION:
             case VELOCITY:
                 double arbitraryFeedForward = m_Config.master.ff;
-                final double convertedPosition = m_MasterEncoder.getPosition() * m_Config.master.positionConversion;
+                final double angle = m_MasterEncoder.getPosition();
                 if (m_Config.master.armFf != null) {
-                    arbitraryFeedForward += m_Config.master.armFf * Math.cos(Math.toRadians(convertedPosition - m_Config.master.armComOffset));
+                    arbitraryFeedForward += m_Config.master.armFf * Math.cos(Math.toRadians(angle - m_Config.master.armComOffset));
                 }
                 double reference;
                 ControlType controlType;
                 switch (m_ControlMode) {
                     case SMART_MOTION:
-                        reference = m_SetPoint / m_Config.master.positionConversion;
+                        reference = m_SetPoint;
                         controlType = ControlType.kSmartMotion;
                         break;
                     case VELOCITY:
-                        reference = m_Velocity / m_Config.master.velocityConversion;
+                        reference = m_Velocity;
                         controlType = ControlType.kSmartVelocity;
                         break;
                     default:
@@ -192,19 +195,21 @@ public class Robot extends TimedRobot {
         check(spark.setClosedLoopRampRate(config.ramp), "closed loop ramp");
         final var controller = spark.getPIDController();
         System.out.printf("Using gains %nP: %s %nI: %s %nD: %s %nF: %s%n%nV: %s %nA: %s%n", config.p, config.i, config.d, config.f, config.v, config.a);
-        final double velocityConversion = m_Config.master.velocityConversion;
-        check(controller.setP(config.p * velocityConversion, PID_SLOT_ID), "p");
-        check(controller.setI(config.i * velocityConversion, PID_SLOT_ID), "i");
-        check(controller.setD(config.d * velocityConversion, PID_SLOT_ID), "d");
-        check(controller.setFF(config.f * velocityConversion, PID_SLOT_ID), "ff");
+        check(controller.setP(config.p, PID_SLOT_ID), "p");
+        check(controller.setI(config.i, PID_SLOT_ID), "i");
+        check(controller.setD(config.d, PID_SLOT_ID), "d");
+        check(controller.setFF(config.f, PID_SLOT_ID), "ff");
         check(controller.setIMaxAccum(0.0, PID_SLOT_ID), "max i");
         check(controller.setOutputRange(-1.0, 1.0, PID_SLOT_ID), "output range");
-        check(controller.setSmartMotionMaxVelocity(config.v / velocityConversion, PID_SLOT_ID), "max velocity");
-        check(controller.setSmartMotionMaxAccel(config.a / velocityConversion, PID_SLOT_ID), "max acceleration");
+        check(controller.setSmartMotionMaxVelocity(config.v, PID_SLOT_ID), "max velocity");
+        check(controller.setSmartMotionMaxAccel(config.a, PID_SLOT_ID), "max acceleration");
         check(controller.setSmartMotionAccelStrategy(AccelStrategy.kSCurve, PID_SLOT_ID), "strategy");
         check(controller.setSmartMotionAllowedClosedLoopError(0.0, PID_SLOT_ID), "error");
         check(controller.setSmartMotionMinOutputVelocity(0.0, PID_SLOT_ID), "min velocity");
         check(spark.setClosedLoopRampRate(config.ramp), "ramp");
+        final var encoder = spark.getEncoder();
+        check(encoder.setPositionConversionFactor(m_Config.master.positionConversion), "position conversion");
+        check(encoder.setVelocityConversionFactor(m_Config.master.velocityConversion), "velocity conversion");
         return spark;
     }
 
