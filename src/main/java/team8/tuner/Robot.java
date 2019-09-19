@@ -77,44 +77,9 @@ public class Robot extends TimedRobot {
                 .collect(Collectors.toList());
     }
 
-    private void setSetPoint(double setPoint) {
-        m_SetPoint = setPoint;
-        m_ControlMode = ControlMode.SMART_MOTION;
-    }
-
     @Override
     public void testPeriodic() {
-        /* Input */
-        if (m_Input.getAButtonPressed()) {
-            setSetPoint(m_Config.aSetPoint);
-        } else if (m_Input.getBButtonPressed()) {
-            setSetPoint(m_Config.bSetPoint);
-        } else if (m_Input.getXButtonPressed()) {
-            setSetPoint(m_Config.xSetPoint);
-        } else if (m_Input.getYButtonPressed()) {
-            setSetPoint(m_Config.ySetPoint);
-        } else if (m_Input.getBumperPressed(Hand.kRight)) {
-            m_ControlMode = ControlMode.PERCENT_OUTPUT;
-            m_PercentOutput = 0.25;
-        } else if (m_Input.getBumperPressed(Hand.kLeft)) {
-            m_ControlMode = ControlMode.DISABLED;
-            System.out.println("Disabling...");
-        } else {
-            double percentOutInput = m_Input.getY(Hand.kLeft);
-            if (Math.abs(percentOutInput) > JOYSTICK_THRESHOLD) {
-                m_PercentOutput = percentOutInput - Math.signum(percentOutInput) * JOYSTICK_THRESHOLD;
-                m_ControlMode = ControlMode.PERCENT_OUTPUT;
-            } else {
-                m_PercentOutput = 0.0;
-            }
-            double velocityInput = m_Input.getY(Hand.kRight);
-            if (Math.abs(velocityInput) > JOYSTICK_THRESHOLD) {
-                m_Velocity = velocityInput - Math.signum(velocityInput) * JOYSTICK_THRESHOLD;
-                m_ControlMode = ControlMode.VELOCITY;
-            } else {
-                m_Velocity = 0.0;
-            }
-        }
+        handleInput();
         /* CSV Data */
         if (m_Config.writeCsv) {
             CSVWriter.addData("totalCurrent", m_PowerDistributionPanel.getTotalCurrent());
@@ -169,6 +134,44 @@ public class Robot extends TimedRobot {
         ifValid(m_Config, config -> {
             if (m_Config.writeCsv) CSVWriter.write();
         });
+    }
+
+    private void handleInput() {
+        if (m_Input.getAButtonPressed()) {
+            setSetPoint(m_Config.aSetPoint);
+        } else if (m_Input.getBButtonPressed()) {
+            setSetPoint(m_Config.bSetPoint);
+        } else if (m_Input.getXButtonPressed()) {
+            setSetPoint(m_Config.xSetPoint);
+        } else if (m_Input.getYButtonPressed()) {
+            setSetPoint(m_Config.ySetPoint);
+        } else if (m_Input.getBumperPressed(Hand.kRight)) {
+            m_ControlMode = ControlMode.PERCENT_OUTPUT;
+            m_PercentOutput = 0.25;
+        } else if (m_Input.getBumperPressed(Hand.kLeft)) {
+            m_ControlMode = ControlMode.DISABLED;
+            System.out.println("Disabling...");
+        } else {
+            double percentOutInput = m_Input.getY(Hand.kLeft);
+            if (Math.abs(percentOutInput) > JOYSTICK_THRESHOLD) {
+                m_PercentOutput = percentOutInput - Math.signum(percentOutInput) * JOYSTICK_THRESHOLD;
+                m_ControlMode = ControlMode.PERCENT_OUTPUT;
+            } else {
+                m_PercentOutput = 0.0;
+            }
+            double velocityInput = m_Input.getY(Hand.kRight);
+            if (Math.abs(velocityInput) > JOYSTICK_THRESHOLD) {
+                m_Velocity = velocityInput - Math.signum(velocityInput) * JOYSTICK_THRESHOLD;
+                m_ControlMode = ControlMode.VELOCITY;
+            } else {
+                m_Velocity = 0.0;
+            }
+        }
+    }
+
+    private void setSetPoint(double setPoint) {
+        m_SetPoint = setPoint;
+        m_ControlMode = ControlMode.SMART_MOTION;
     }
 
     private CANSparkMax setupSpark(int id) {
