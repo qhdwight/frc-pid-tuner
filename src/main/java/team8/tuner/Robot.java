@@ -25,20 +25,20 @@ import java.util.stream.Collectors;
 public class Robot extends TimedRobot {
 
     enum ControlMode {
-        DISABLED, SMART_MOTION, VELOCITY
+        DISABLED, SMART_MOTION, VELOCITY, PERCENT_OUTPUT
     }
 
     private static final int PID_SLOT_ID = 0;
-    private static final double JOYSTICK_THRESHOLD = 0.07;
+    private static final double JOYSTICK_THRESHOLD = 0.1;
 
     private Config m_Config;
     private CANSparkMax m_Master;
     private CANPIDController m_MasterController;
     private CANEncoder m_MasterEncoder;
     private List<CANSparkMax> m_Slaves;
-    private XboxController m_Controller;
+    private XboxController m_Input;
     private PowerDistributionPanel m_PowerDistributionPanel;
-    private double m_SetPoint, m_Velocity;
+    private double m_SetPoint, m_Velocity, m_PercentOutput;
     private ControlMode m_ControlMode = ControlMode.DISABLED;
 
     @Override
@@ -61,7 +61,7 @@ public class Robot extends TimedRobot {
         CSVWriter.init();
         m_Config = C.readGenericConfig(Config.class);
         System.out.printf("Initializing PID tuner with:%n%s%n", C.getJson(Config.class));
-        m_Controller = new XboxController(m_Config.xboxId);
+        m_Input = new XboxController(m_Config.xboxId);
         System.out.printf("Using X-Box controller with id: %d%n", m_Config.xboxId);
         /* Master */
         ifValid(m_Master, CANSparkMax::close); // TODO closing does not even do anything?
@@ -85,21 +85,28 @@ public class Robot extends TimedRobot {
     @Override
     public void testPeriodic() {
         /* Input */
-        if (m_Controller.getAButtonPressed()) {
+        if (m_Input.getAButtonPressed()) {
             setSetPoint(m_Config.aSetPoint);
-        } else if (m_Controller.getBButtonPressed()) {
+        } else if (m_Input.getBButtonPressed()) {
             setSetPoint(m_Config.bSetPoint);
-        } else if (m_Controller.getXButtonPressed()) {
+        } else if (m_Input.getXButtonPressed()) {
             setSetPoint(m_Config.xSetPoint);
-        } else if (m_Controller.getYButtonPressed()) {
+        } else if (m_Input.getYButtonPressed()) {
             setSetPoint(m_Config.ySetPoint);
-        } else if (m_Controller.getBackButtonPressed()) {
+        } else if (m_Input.getBackButtonPressed()) {
             m_ControlMode = ControlMode.DISABLED;
             System.out.println("Disabling...");
         } else {
-            double input = m_Controller.getY(Hand.kRight);
-            if (Math.abs(input) > JOYSTICK_THRESHOLD) {
-                m_Velocity = input;
+            double percentOutInput = m_Input.getY(Hand.kLeft);
+            if (Math.abs(percentOutInput) > JOYSTICK_THRESHOLD) {
+                m_PercentOutput = percentOutInput - Math.signum(percentOutInput) * JOYSTICK_THRESHOLD;
+                m_ControlMode = ControlMode.PERCENT_OUTPUT;
+            } else {
+                m_PercentOutput = 0.0;
+            }
+            double velocityInput = m_Input.getY(Hand.kRight);
+            if (Math.abs(velocityInput) > JOYSTICK_THRESHOLD) {
+                m_Velocity = velocityInput - Math.signum(velocityInput) * JOYSTICK_THRESHOLD;
                 m_ControlMode = ControlMode.VELOCITY;
             } else {
                 m_Velocity = 0.0;
@@ -141,6 +148,9 @@ public class Robot extends TimedRobot {
                         controlType, PID_SLOT_ID,
                         arbitraryFeedForward, ArbFFUnits.kPercentOut
                 );
+                break;
+            case PERCENT_OUTPUT:
+                m_Master.set(m_PercentOutput);
                 break;
             case DISABLED:
                 m_Master.disable();
