@@ -59,8 +59,8 @@ public class Robot extends TimedRobot {
     @Override
     public void testInit() {
         CSVWriter.init();
-        m_Config = C.readGenericConfig(Config.class);
-        System.out.printf("Initializing PID tuner with:%n%s%n", C.getJson(Config.class));
+        m_Config = C.read(Config.class);
+        System.out.printf("Initializing PID tuner with:%n%s%n", m_Config);
         m_Input = new XboxController(m_Config.xboxId);
         System.out.printf("Using X-Box controller with id: %d%n", m_Config.xboxId);
         /* Master */
@@ -83,7 +83,7 @@ public class Robot extends TimedRobot {
         /* CSV Data */
         if (m_Config.writeCsv) {
             CSVWriter.addData("totalCurrent", m_PowerDistributionPanel.getTotalCurrent());
-            CSVWriter.addData("sparkCurrent", m_Master.getOutputCurrent() + m_Slaves.get(0).getOutputCurrent());
+            CSVWriter.addData("sparkCurrent", m_Master.getOutputCurrent() + m_Slaves.stream().mapToDouble(CANSparkMax::getOutputCurrent).sum());
             CSVWriter.addData("output", m_Master.getAppliedOutput());
             CSVWriter.addData("position", m_MasterEncoder.getPosition());
             CSVWriter.addData("velocity", m_MasterEncoder.getVelocity());
@@ -197,7 +197,6 @@ public class Robot extends TimedRobot {
         check(spark.enableVoltageCompensation(config.voltageCompensation), "voltage compensation");
         check(spark.setClosedLoopRampRate(config.ramp), "closed loop ramp");
         final var controller = spark.getPIDController();
-        System.out.printf("Using gains %nP: %s %nI: %s %nD: %s %nF: %s%n%nV: %s %nA: %s%n", config.p, config.i, config.d, config.f, config.v, config.a);
         check(controller.setP(config.p, PID_SLOT_ID), "p");
         check(controller.setI(config.i, PID_SLOT_ID), "i");
         check(controller.setD(config.d, PID_SLOT_ID), "d");

@@ -9,79 +9,25 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Config storage using JSON
- * <p>
- * Register classes with {@link #sConfigs} and get the working copy via {@link #get(Class)}
  *
  * @author Quintin Dwight
  */
 public class C {
 
-//    interface SetPidValue {
-//        CANError set(CANPIDController controller, double value, int slot);
-//    }
+    private static ObjectMapper sMapper = new ObjectMapper();
 
     private static final Path CONFIG_FOLDER = RobotBase.isReal()
             ? Paths.get(Filesystem.getDeployDirectory().toString(), "config_v2")
             : Paths.get(Filesystem.getLaunchDirectory().toString(), "src", "main", "deploy", "config_v2");
-    private static Class[] sConfigs = new Class[]{Config.class};
-    private static ObjectMapper sMapper = new ObjectMapper();
-    private static Map<Class<?>, Object> sConfigMap = new HashMap<>(sConfigs.length) {{
-        for (Class<?> configClass : sConfigs) {
-            put(configClass, readGenericConfig(configClass));
-        }
-    }};
 
-//    private static Map<String, SetPidValue> sConfigNameToControllerSetter = Map.ofEntries(
-//            Map.entry("p", CANPIDController::setP),
-//            Map.entry("i", CANPIDController::setI),
-//            Map.entry("d", CANPIDController::setP),
-//            Map.entry("f", CANPIDController::setFF),
-//            Map.entry("a", CANPIDController::setSmartMotionMaxAccel),
-//            Map.entry("v", CANPIDController::setSmartMotionMaxVelocity)
-//    );
-
-    /**
-     * Retrieve the singleton for this given config class.
-     * It must be registered with {@link #sConfigs}.
-     *
-     * @param configClass Class of the config.
-     * @param <T>         Type of the config class. This is usually inferred from the class argument.
-     * @return Singleton or null if not found / registered.
-     */
-    @SuppressWarnings("unchecked")
-    public static <T extends AbstractConfig> T get(Class<T> configClass) {
-        return (T) sConfigMap.get(configClass);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T extends AbstractConfig> boolean save(Class<T> configClass) {
-        T config = (T) sConfigMap.get(configClass);
-        try {
-            writeConfig(config);
-            return true;
-        } catch (IOException exception) {
-            exception.printStackTrace();
-            return false;
-        }
-    }
-
-    public static <T extends AbstractConfig> String getJson(Class<T> configClass) {
-        try {
-            return sMapper.defaultPrettyPrintingWriter().writeValueAsString(sConfigMap.get(configClass));
-        } catch (IOException exception) {
-            return "Error";
-        }
-    }
-
-    private static File getFileForConfig(Class<?> configClass) {
-        return Paths.get(CONFIG_FOLDER.toString(), String.format("%s.json", configClass.getSimpleName())).toFile();
-    }
-
-    public static <T> T readGenericConfig(Class<T> configClass) {
+    public static <T extends AbstractConfig> T read(Class<T> configClass) {
         File configFile = getFileForConfig(configClass);
         String configClassName = configClass.getSimpleName();
         if (!configFile.exists()) {
@@ -97,7 +43,11 @@ public class C {
         }
     }
 
-    private static <T> T saveDefaultConfig(Class<T> configClass) {
+    private static File getFileForConfig(Class<? extends AbstractConfig> configClass) {
+        return Paths.get(CONFIG_FOLDER.toString(), String.format("%s.json", configClass.getSimpleName())).toFile();
+    }
+
+    private static <T extends AbstractConfig> T saveDefaultConfig(Class<T> configClass) {
         try {
             T newConfig = configClass.getDeclaredConstructor().newInstance();
             try {
@@ -115,8 +65,7 @@ public class C {
         }
     }
 
-    private static void writeConfig(Object newConfig) throws IOException {
-        System.out.println(sMapper.defaultPrettyPrintingWriter().writeValueAsString(newConfig));
+    private static <T extends AbstractConfig> void writeConfig(T newConfig) throws IOException {
         File file = getFileForConfig(newConfig.getClass()), parentFile = file.getParentFile();
         if (!parentFile.exists()) {
             if (!parentFile.mkdirs()) throw new IOException();
