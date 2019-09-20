@@ -5,10 +5,10 @@
         "positionConversion": 0.7288494956328321,
         "velocityConversion": 0.7288494956328321,
         "ff": 0.0310,
-        "f": 0.0,
+        "f": 0.0002631578947368421,
         "p": 0.0,
-        "a": 0,
-        "v": 58,
+        "a": 500,
+        "v": 400,
         "ramp": 0.1,
         "isInverted": true
     },
@@ -20,6 +20,6 @@
     "xboxId": 2,
     "aSetPoint": 0.0,
     "bSetPoint": 12.0,
-    "xSetPoint": 40.0,
+    "xSetPoint": 30.0,
     "ySetPoint": 60.0
 }
