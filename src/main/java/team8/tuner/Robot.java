@@ -39,6 +39,7 @@ public class Robot extends TimedRobot {
     private XboxController m_Input;
     private PowerDistributionPanel m_PowerDistributionPanel;
     private double m_SetPoint, m_Velocity, m_PercentOutput;
+    private boolean m_RunningConstantPercentOutput;
     private ControlMode m_ControlMode = ControlMode.DISABLED;
 
     @Override
@@ -82,7 +83,7 @@ public class Robot extends TimedRobot {
         handleInput();
         /* CSV Data */
         if (m_Config.writeCsv) {
-            CSVWriter.addData("totalCurrent", m_PowerDistributionPanel.getTotalCurrent());
+            CSVWriter.addData("totalPower", m_PowerDistributionPanel.getTotalPower());
             CSVWriter.addData("sparkCurrent", m_Master.getOutputCurrent() + m_Slaves.get(0).getOutputCurrent());
             CSVWriter.addData("output", m_Master.getAppliedOutput());
             CSVWriter.addData("position", m_MasterEncoder.getPosition());
@@ -147,21 +148,23 @@ public class Robot extends TimedRobot {
             setSetPoint(m_Config.ySetPoint);
         } else if (m_Input.getBumperPressed(Hand.kRight)) {
             m_ControlMode = ControlMode.PERCENT_OUTPUT;
-            m_PercentOutput = 0.25;
+            m_PercentOutput = 0.2 + m_Config.master.ff;
+            m_RunningConstantPercentOutput = true;
         } else if (m_Input.getBumperPressed(Hand.kLeft)) {
             m_ControlMode = ControlMode.DISABLED;
             System.out.println("Disabling...");
         } else {
-            double percentOutInput = m_Input.getY(Hand.kLeft);
+            double percentOutInput = m_Input.getY(Hand.kLeft) * -0.3;
             if (Math.abs(percentOutInput) > JOYSTICK_THRESHOLD) {
                 m_PercentOutput = percentOutInput - Math.signum(percentOutInput) * JOYSTICK_THRESHOLD;
                 m_ControlMode = ControlMode.PERCENT_OUTPUT;
+                m_RunningConstantPercentOutput = false;
             } else {
-                m_PercentOutput = 0.0;
+                if (!m_RunningConstantPercentOutput) m_PercentOutput = 0.0;
             }
-            double velocityInput = m_Input.getY(Hand.kRight);
+            double velocityInput = m_Input.getY(Hand.kRight) * -0.5;
             if (Math.abs(velocityInput) > JOYSTICK_THRESHOLD) {
-                m_Velocity = velocityInput - Math.signum(velocityInput) * JOYSTICK_THRESHOLD;
+                m_Velocity = (velocityInput - Math.signum(velocityInput) * JOYSTICK_THRESHOLD) * m_Config.master.v;
                 m_ControlMode = ControlMode.VELOCITY;
             } else {
                 m_Velocity = 0.0;
@@ -203,7 +206,7 @@ public class Robot extends TimedRobot {
         check(controller.setD(config.d, PID_SLOT_ID), "d");
         check(controller.setFF(config.f, PID_SLOT_ID), "ff");
         check(controller.setIMaxAccum(0.0, PID_SLOT_ID), "max i");
-        check(controller.setOutputRange(-1.0, 1.0, PID_SLOT_ID), "output range");
+        check(controller.setOutputRange(-0.8, 0.8, PID_SLOT_ID), "output range");
         check(controller.setSmartMotionMaxVelocity(config.v, PID_SLOT_ID), "max velocity");
         check(controller.setSmartMotionMaxAccel(config.a, PID_SLOT_ID), "max acceleration");
         check(controller.setSmartMotionAccelStrategy(AccelStrategy.kSCurve, PID_SLOT_ID), "strategy");
