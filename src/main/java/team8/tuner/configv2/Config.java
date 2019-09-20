@@ -13,6 +13,7 @@ public class Config extends AbstractConfig {
         public Double armFf;
         public double voltageCompensation = 12.0;
         public double positionConversion = 1.0, velocityConversion = 1.0;
+        public double minimumOutput = -1.0, maximumOutput = 1.0;
         public Float forwardLimit, reverseLimit;
         public boolean isBraked = true;
     }

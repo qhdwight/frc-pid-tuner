@@ -61,6 +61,10 @@ public class Robot extends TimedRobot {
     public void testInit() {
         CSVWriter.init();
         m_Config = C.read(Config.class);
+        applyConfig();
+    }
+
+    private void applyConfig() {
         System.out.printf("Initializing PID tuner with:%n%s%n", m_Config);
         m_Input = new XboxController(m_Config.xboxId);
         System.out.printf("Using X-Box controller with id: %d%n", m_Config.xboxId);
@@ -205,7 +209,7 @@ public class Robot extends TimedRobot {
         check(controller.setD(config.d, PID_SLOT_ID), "d");
         check(controller.setFF(config.f, PID_SLOT_ID), "ff");
         check(controller.setIMaxAccum(0.0, PID_SLOT_ID), "max i");
-        check(controller.setOutputRange(-0.8, 0.8, PID_SLOT_ID), "output range");
+        check(controller.setOutputRange(m_Config.master.minimumOutput, m_Config.master.maximumOutput, PID_SLOT_ID), "output range");
         check(controller.setSmartMotionMaxVelocity(config.v, PID_SLOT_ID), "max velocity");
         check(controller.setSmartMotionMaxAccel(config.a, PID_SLOT_ID), "max acceleration");
         check(controller.setSmartMotionAccelStrategy(AccelStrategy.kSCurve, PID_SLOT_ID), "strategy");
