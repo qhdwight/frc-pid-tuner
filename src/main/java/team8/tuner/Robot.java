@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
     }
 
     private static final int PID_SLOT_ID = 0;
-    private static final double JOYSTICK_THRESHOLD = 0.1;
+    private static final double JOYSTICK_THRESHOLD = 0.07;
 
     private Config m_Config;
     private CANSparkMax m_Master;
@@ -152,13 +152,13 @@ public class Robot extends TimedRobot {
             setSetPoint(m_Config.ySetPoint);
         } else if (m_Input.getBumperPressed(Hand.kRight)) {
             m_ControlMode = ControlMode.PERCENT_OUTPUT;
-            m_PercentOutput = 0.2 + m_Config.master.ff;
+            m_PercentOutput = 0.3 + m_Config.master.ff;
             m_RunningConstantPercentOutput = true;
         } else if (m_Input.getBumperPressed(Hand.kLeft)) {
             m_ControlMode = ControlMode.DISABLED;
             System.out.println("Disabling...");
         } else {
-            double percentOutInput = m_Input.getY(Hand.kLeft) * -0.3;
+            double percentOutInput = m_Input.getY(Hand.kLeft) * -0.4;
             if (Math.abs(percentOutInput) > JOYSTICK_THRESHOLD) {
                 m_PercentOutput = percentOutInput - Math.signum(percentOutInput) * JOYSTICK_THRESHOLD;
                 m_ControlMode = ControlMode.PERCENT_OUTPUT;
@@ -166,7 +166,7 @@ public class Robot extends TimedRobot {
             } else {
                 if (!m_RunningConstantPercentOutput) m_PercentOutput = 0.0;
             }
-            double velocityInput = m_Input.getY(Hand.kRight) * -0.5;
+            double velocityInput = m_Input.getY(Hand.kRight) * -0.7;
             if (Math.abs(velocityInput) > JOYSTICK_THRESHOLD) {
                 m_Velocity = (velocityInput - Math.signum(velocityInput) * JOYSTICK_THRESHOLD) * m_Config.master.v;
                 m_ControlMode = ControlMode.VELOCITY;
