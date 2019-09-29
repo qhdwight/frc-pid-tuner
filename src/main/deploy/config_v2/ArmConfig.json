@@ -1,0 +1,29 @@
+{
+    "master": {
+        "id": 4,
+        "voltageCompensation": 12,
+        "positionConversion": 3.0340557275541795,
+        "velocityConversion": 3.0340557275541795,
+        "armFf": 0.026,
+        "armComOffset": 19,
+        "ff": 0.0,
+        "f": 0.00006,
+        "p": 0.000002,
+        "a": 32000.0,
+        "v": 8000.0,
+        "allowableError": 0.2,
+        "isBraked": true,
+        "ramp": 0.12,
+        "startingPosition": 20.0
+    },
+    "slaves": [
+        {
+            "id": 5
+        }
+    ],
+    "xboxId": 2,
+    "aSetPoint": 0.0,
+    "bSetPoint": 30.0,
+    "xSetPoint": 60.0,
+    "ySetPoint": 95.0
+}

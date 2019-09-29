@@ -152,7 +152,7 @@ public class Robot extends TimedRobot {
             setSetPoint(m_Config.ySetPoint);
         } else if (m_Input.getBumperPressed(Hand.kRight)) {
             m_ControlMode = ControlMode.PERCENT_OUTPUT;
-            m_PercentOutput = 0.3 + m_Config.master.ff;
+            m_PercentOutput = 0.1 + m_Config.master.ff;
             m_RunningConstantPercentOutput = true;
         } else if (m_Input.getBumperPressed(Hand.kLeft)) {
             m_ControlMode = ControlMode.DISABLED;
@@ -185,7 +185,6 @@ public class Robot extends TimedRobot {
         final var spark = new CANSparkMax(id, MotorType.kBrushless);
         System.out.printf("Setup spark with id %d%n", id);
         check(spark.restoreFactoryDefaults(), "factory defaults");
-        check(spark.getEncoder().setPosition(0.0), "reset encoder");
         return spark;
     }
 
@@ -213,12 +212,13 @@ public class Robot extends TimedRobot {
         check(controller.setSmartMotionMaxVelocity(config.v, PID_SLOT_ID), "max velocity");
         check(controller.setSmartMotionMaxAccel(config.a, PID_SLOT_ID), "max acceleration");
         check(controller.setSmartMotionAccelStrategy(AccelStrategy.kSCurve, PID_SLOT_ID), "strategy");
-        check(controller.setSmartMotionAllowedClosedLoopError(0.0, PID_SLOT_ID), "error");
+        check(controller.setSmartMotionAllowedClosedLoopError(m_Config.master.allowableError, PID_SLOT_ID), "error");
         check(controller.setSmartMotionMinOutputVelocity(0.0, PID_SLOT_ID), "min velocity");
         check(spark.setClosedLoopRampRate(config.ramp), "ramp");
         final var encoder = spark.getEncoder();
         check(encoder.setPositionConversionFactor(m_Config.master.positionConversion), "position conversion");
         check(encoder.setVelocityConversionFactor(m_Config.master.velocityConversion), "velocity conversion");
+        check(encoder.setPosition(m_Config.master.startingPosition), "starting position");
         return spark;
     }
 

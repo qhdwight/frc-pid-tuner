@@ -1,26 +1,24 @@
 {
     "master": {
-        "id": 4,
+        "id": 11,
         "voltageCompensation": 12,
-        "positionConversion": 3.0340557275541795,
-        "velocityConversion": 3.0340557275541795,
-        "armFf": 0.026,
-        "armComOffset": 11.5,
+        "positionConversion": 3.141592653589793,
+        "velocityConversion": 3.141592653589793,
         "ff": 0.0,
-        "f": 0.00006,
-        "p": 0.000002,
-        "a": 48000.0,
-        "v": 13000.0,
-        "ramp": 0.12
+        "f": 0.0004,
+        "p": 0.00005,
+        "d": 0.00005,
+        "a": 2000.0,
+        "v": 1500.0,
+        "allowableError": 0.2,
+        "isBraked": true,
+        "ramp": 0.05,
+        "startingPosition": 0.0,
+        "isInverted": true
     },
-    "slaves": [
-        {
-            "id": 5
-        }
-    ],
     "xboxId": 2,
     "aSetPoint": 0.0,
-    "bSetPoint": 30.0,
-    "xSetPoint": 60.0,
-    "ySetPoint": 95.0
+    "bSetPoint": 3.0,
+    "xSetPoint": 5.0,
+    "ySetPoint": 5.5
 }
