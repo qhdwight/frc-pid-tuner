@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class Robot extends TimedRobot {
 
     enum ControlMode {
-        DISABLED, SMART_MOTION, VELOCITY, PERCENT_OUTPUT
+        DISABLED, SMART_MOTION, SMART_VELOCITY, PERCENT_OUTPUT
     }
 
     private static final int PID_SLOT_ID = 0;
@@ -96,7 +96,7 @@ public class Robot extends TimedRobot {
         /* Sending output to controllers */
         switch (m_ControlMode) {
             case SMART_MOTION:
-            case VELOCITY:
+            case SMART_VELOCITY:
                 double arbitraryFeedForward = m_Config.master.ff;
                 final double angle = m_MasterEncoder.getPosition();
                 if (m_Config.master.armFf != null) {
@@ -109,7 +109,7 @@ public class Robot extends TimedRobot {
                         reference = m_SetPoint;
                         controlType = ControlType.kSmartMotion;
                         break;
-                    case VELOCITY:
+                    case SMART_VELOCITY:
                         reference = m_Velocity;
                         controlType = ControlType.kSmartVelocity;
                         break;
@@ -169,7 +169,7 @@ public class Robot extends TimedRobot {
             double velocityInput = m_Input.getY(Hand.kRight) * -0.7;
             if (Math.abs(velocityInput) > JOYSTICK_THRESHOLD) {
                 m_Velocity = (velocityInput - Math.signum(velocityInput) * JOYSTICK_THRESHOLD) * m_Config.master.v;
-                m_ControlMode = ControlMode.VELOCITY;
+                m_ControlMode = ControlMode.SMART_VELOCITY;
             } else {
                 m_Velocity = 0.0;
             }
