@@ -6,12 +6,14 @@
         "velocityConversion": 3.0340557275541795,
         "armFf": 0.026,
         "armComOffset": 19,
-        "ff": 0.0,
-        "f": 0.00006,
-        "p": 0.000002,
-        "a": 32000.0,
-        "v": 8000.0,
-        "allowableError": 0.2,
+        "gains": {
+            "ff": 0.0,
+            "f": 0.00006,
+            "p": 0.000002,
+            "a": 32000.0,
+            "v": 8000.0,
+            "allowableError": 0.2
+        },
         "isBraked": true,
         "ramp": 0.12,
         "startingPosition": 20.0

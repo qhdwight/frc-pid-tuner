@@ -97,7 +97,7 @@ public class Robot extends TimedRobot {
         switch (m_ControlMode) {
             case SMART_MOTION:
             case SMART_VELOCITY:
-                double arbitraryFeedForward = m_Config.master.ff;
+                double arbitraryFeedForward = m_Config.master.gains.ff;
                 final double angle = m_MasterEncoder.getPosition();
                 if (m_Config.master.armFf != null) {
                     arbitraryFeedForward += m_Config.master.armFf * Math.cos(Math.toRadians(angle - m_Config.master.armComOffset));
@@ -152,7 +152,7 @@ public class Robot extends TimedRobot {
             setSetPoint(m_Config.ySetPoint);
         } else if (m_Input.getBumperPressed(Hand.kRight)) {
             m_ControlMode = ControlMode.PERCENT_OUTPUT;
-            m_PercentOutput = 0.1 + m_Config.master.ff;
+            m_PercentOutput = 0.2 + m_Config.master.gains.ff;
             m_RunningConstantPercentOutput = true;
         } else if (m_Input.getBumperPressed(Hand.kLeft)) {
             m_ControlMode = ControlMode.DISABLED;
@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
             }
             double velocityInput = m_Input.getY(Hand.kRight) * -0.7;
             if (Math.abs(velocityInput) > JOYSTICK_THRESHOLD) {
-                m_Velocity = (velocityInput - Math.signum(velocityInput) * JOYSTICK_THRESHOLD) * m_Config.master.v;
+                m_Velocity = (velocityInput - Math.signum(velocityInput) * JOYSTICK_THRESHOLD) * m_Config.master.gains.v;
                 m_ControlMode = ControlMode.SMART_VELOCITY;
             } else {
                 m_Velocity = 0.0;
@@ -203,18 +203,17 @@ public class Robot extends TimedRobot {
         check(spark.enableVoltageCompensation(config.voltageCompensation), "voltage compensation");
         check(spark.setClosedLoopRampRate(config.ramp), "closed loop ramp");
         final var controller = spark.getPIDController();
-        check(controller.setP(config.p, PID_SLOT_ID), "p");
-        check(controller.setI(config.i, PID_SLOT_ID), "i");
-        check(controller.setD(config.d, PID_SLOT_ID), "d");
-        check(controller.setFF(config.f, PID_SLOT_ID), "ff");
+        check(controller.setP(config.gains.p, PID_SLOT_ID), "p");
+        check(controller.setI(config.gains.i, PID_SLOT_ID), "i");
+        check(controller.setD(config.gains.d, PID_SLOT_ID), "d");
+        check(controller.setFF(config.gains.f, PID_SLOT_ID), "ff");
         check(controller.setIMaxAccum(0.0, PID_SLOT_ID), "max i");
         check(controller.setOutputRange(m_Config.master.minimumOutput, m_Config.master.maximumOutput, PID_SLOT_ID), "output range");
-        check(controller.setSmartMotionMaxVelocity(config.v, PID_SLOT_ID), "max velocity");
-        check(controller.setSmartMotionMaxAccel(config.a, PID_SLOT_ID), "max acceleration");
+        check(controller.setSmartMotionMaxVelocity(config.gains.v, PID_SLOT_ID), "max velocity");
+        check(controller.setSmartMotionMaxAccel(config.gains.a, PID_SLOT_ID), "max acceleration");
         check(controller.setSmartMotionAccelStrategy(AccelStrategy.kSCurve, PID_SLOT_ID), "strategy");
-        check(controller.setSmartMotionAllowedClosedLoopError(m_Config.master.allowableError, PID_SLOT_ID), "error");
+        check(controller.setSmartMotionAllowedClosedLoopError(m_Config.master.gains.allowableError, PID_SLOT_ID), "error");
         check(controller.setSmartMotionMinOutputVelocity(0.0, PID_SLOT_ID), "min velocity");
-        check(spark.setClosedLoopRampRate(config.ramp), "ramp");
         final var encoder = spark.getEncoder();
         check(encoder.setPositionConversionFactor(m_Config.master.positionConversion), "position conversion");
         check(encoder.setVelocityConversionFactor(m_Config.master.velocityConversion), "velocity conversion");
