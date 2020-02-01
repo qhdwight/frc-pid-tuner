@@ -1,0 +1,27 @@
+{
+    "master": {
+        "id": 1,
+        "type": "SPARK",
+        "voltageCompensation": 12.0,
+        "positionConversion": 1.0,
+        "velocityConversion": 1.0,
+        "gains": {
+            "ff": 0.0,
+            "f": 0.0,
+            "p": 0.0,
+            "d": 0.0,
+            "a": 0.0,
+            "v": 0.0,
+            "allowableError": 0.0
+        },
+        "isBraked": true,
+        "ramp": 0.0,
+        "startingPosition": 0.0,
+        "isInverted": false
+    },
+    "xboxId": 2,
+    "aSetPoint": 0.0,
+    "bSetPoint": 0.0,
+    "xSetPoint": 0.0,
+    "ySetPoint": 0.5
+}
