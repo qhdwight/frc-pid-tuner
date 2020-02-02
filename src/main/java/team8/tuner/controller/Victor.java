@@ -7,17 +7,17 @@ import java.util.function.Function;
 
 public class Victor extends CTREControllerBase<VictorSPX> {
 
-    public Victor(SimpleConfig config) {
-        super(config);
-    }
+	public Victor(SimpleConfig config) {
+		super(config);
+	}
 
-    @Override
-    Function<Integer, VictorSPX> controllerFactory() {
-        return VictorSPX::new;
-    }
+	@Override
+	Function<Integer, VictorSPX> controllerFactory() {
+		return VictorSPX::new;
+	}
 
-    @Override
-    public double getOutputCurrent() {
-        return 0.0;
-    }
+	@Override
+	public double getOutputCurrent() {
+		return 0.0;
+	}
 }

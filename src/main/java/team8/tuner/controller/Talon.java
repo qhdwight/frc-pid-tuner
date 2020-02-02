@@ -7,12 +7,12 @@ import java.util.function.Function;
 
 public class Talon extends TalonControllerBase<TalonSRX> {
 
-    public Talon(SimpleConfig config) {
-        super(config);
-    }
+	public Talon(SimpleConfig config) {
+		super(config);
+	}
 
-    @Override
-    Function<Integer, TalonSRX> controllerFactory() {
-        return TalonSRX::new;
-    }
+	@Override
+	Function<Integer, TalonSRX> controllerFactory() {
+		return TalonSRX::new;
+	}
 }

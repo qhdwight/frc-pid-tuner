@@ -4,11 +4,11 @@ import java.util.function.Function;
 
 public abstract class ControllerBase<TController> implements Controller {
 
-    protected TController mController;
+	protected TController mController;
 
-    ControllerBase(int deviceId) {
-        mController = controllerFactory().apply(deviceId);
-    }
+	ControllerBase(int deviceId) {
+		mController = controllerFactory().apply(deviceId);
+	}
 
-    abstract Function<Integer, TController> controllerFactory();
+	abstract Function<Integer, TController> controllerFactory();
 }

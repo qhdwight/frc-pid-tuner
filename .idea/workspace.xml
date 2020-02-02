@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="269c6f56-e6de-4b86-9645-5151a7d834a0" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/deploy/config/Config.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/deploy/config/Config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/team8/tuner/Robot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team8/tuner/Robot.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/team8/tuner/controller/Falcon.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team8/tuner/controller/Falcon.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -64,6 +61,10 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
     <property name="show.unlinked.gradle.project.popup" value="true" />
   </component>
   <component name="RunAnythingCache">
@@ -193,6 +194,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1920.1080/-3840.-523.1920.1080@0.0.1920.1080" timestamp="1580598446320" />
+    <state x="440" y="115" width="1388" height="714" key="SettingsEditor" timestamp="1580672282803">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="440" y="115" width="1388" height="714" key="SettingsEditor/0.0.1920.1080/-3840.-523.1920.1080@0.0.1920.1080" timestamp="1580672282803" />
     <state x="631" y="364" key="com.intellij.ide.util.TipDialog" timestamp="1580589095233">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -201,17 +206,17 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="690" y="290" key="extract.method.dialog/0.0.1920.1080/-3840.-523.1920.1080@0.0.1920.1080" timestamp="1580596249986" />
-    <state x="639" y="278" width="642" height="524" key="find.popup" timestamp="1580598203050">
+    <state x="639" y="278" width="642" height="524" key="find.popup" timestamp="1580672355400">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="639" y="278" width="642" height="524" key="find.popup/0.0.1920.1080/-3840.-523.1920.1080@0.0.1920.1080" timestamp="1580598203050" />
+    <state x="639" y="278" width="642" height="524" key="find.popup/0.0.1920.1080/-3840.-523.1920.1080@0.0.1920.1080" timestamp="1580672355400" />
     <state x="616" y="250" width="672" height="677" key="run.anything.popup" timestamp="1580598020901">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="616" y="250" width="672" height="677" key="run.anything.popup/0.0.1920.1080/-3840.-523.1920.1080@0.0.1920.1080" timestamp="1580598020901" />
-    <state x="623" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1580597200652">
+    <state x="623" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1580672381312">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="623" y="235" width="672" height="678" key="search.everywhere.popup/0.0.1920.1080/-3840.-523.1920.1080@0.0.1920.1080" timestamp="1580597200652" />
+    <state x="623" y="235" width="672" height="678" key="search.everywhere.popup/0.0.1920.1080/-3840.-523.1920.1080@0.0.1920.1080" timestamp="1580672381312" />
   </component>
 </project>

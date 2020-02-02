@@ -9,14 +9,14 @@ import java.util.function.Function;
 
 public class Falcon extends TalonControllerBase<TalonFX> {
 
-    public Falcon(SimpleConfig config) {
-        super(config);
-        mController.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, kTimeout);
-        mController.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero, kTimeout);
-    }
+	public Falcon(SimpleConfig config) {
+		super(config);
+		check(mController.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, kTimeout), "selected sensor");
+		check(mController.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero, kTimeout), "sensor initialization strategy");
+	}
 
-    @Override
-    Function<Integer, TalonFX> controllerFactory() {
-        return TalonFX::new;
-    }
+	@Override
+	Function<Integer, TalonFX> controllerFactory() {
+		return TalonFX::new;
+	}
 }

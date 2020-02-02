@@ -2,19 +2,19 @@ package team8.tuner.controller;
 
 public interface Controller {
 
-    void follow(Controller master);
+	enum ControlMode {
+		DISABLED, SMART_MOTION, SMART_VELOCITY, PERCENT_OUTPUT
+	}
 
-    void setOutput(ControlMode controlMode, double reference, double arbitraryFeedForward);
+	void follow(Controller master);
 
-    double getOutputCurrent();
+	void setOutput(ControlMode controlMode, double reference, double arbitraryFeedForward);
 
-    double getPosition();
+	double getOutputCurrent();
 
-    double getVelocity();
+	double getPosition();
 
-    double getAppliedOutput();
+	double getVelocity();
 
-    public enum ControlMode {
-        DISABLED, SMART_MOTION, SMART_VELOCITY, PERCENT_OUTPUT
-    }
+	double getAppliedOutput();
 }
