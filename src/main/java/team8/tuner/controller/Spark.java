@@ -18,37 +18,35 @@ public class Spark extends ControllerBase<CANSparkMax> {
 	private final CANPIDController mPidController;
 	private final CANEncoder mEncoder;
 
-	public Spark(MasterConfig config) {
-		this((SimpleConfig) config);
-		configureSoftLimit(SoftLimitDirection.kForward, config.forwardLimit);
-		configureSoftLimit(SoftLimitDirection.kReverse, config.reverseLimit);
-		mController.setInverted(config.isInverted);
-		check(mController.setIdleMode(config.isBraked ? IdleMode.kBrake : IdleMode.kCoast), "idle mode");
-		check(mController.enableVoltageCompensation(config.voltageCompensation), "voltage compensation");
-		check(mController.setClosedLoopRampRate(config.ramp), "closed loop ramp");
-		check(mPidController.setP(config.gains.p, kPidSlotIndex), "p");
-		check(mPidController.setI(config.gains.i, kPidSlotIndex), "i");
-		check(mPidController.setD(config.gains.d, kPidSlotIndex), "d");
-		check(mPidController.setFF(config.gains.f, kPidSlotIndex), "f");
-		check(mPidController.setIMaxAccum(config.gains.iMax, kPidSlotIndex), "i max");
-		check(mPidController.setIZone(config.gains.iZone, kPidSlotIndex), "i zone");
-		check(mPidController.setOutputRange(config.minimumOutput, config.maximumOutput, kPidSlotIndex), "output range");
-		check(mPidController.setSmartMotionAccelStrategy(AccelStrategy.kSCurve, kPidSlotIndex), "strategy");
-		check(mPidController.setSmartMotionMaxVelocity(config.gains.v, kPidSlotIndex), "max velocity");
-		check(mPidController.setSmartMotionMaxAccel(config.gains.a, kPidSlotIndex), "max acceleration");
-		check(mPidController.setSmartMotionAllowedClosedLoopError(config.gains.allowableError, kPidSlotIndex), "allowable error");
-		check(mPidController.setSmartMotionMinOutputVelocity(0.0, kPidSlotIndex), "min velocity");
-		check(mEncoder.setPositionConversionFactor(config.positionConversion), "position conversion");
-		check(mEncoder.setVelocityConversionFactor(config.velocityConversion), "velocity conversion");
-		check(mEncoder.setPosition(config.startingPosition), "starting position");
-	}
-
 	public Spark(SimpleConfig config) {
 		super(config.id);
 		mPidController = mController.getPIDController();
 		mEncoder = mController.getEncoder();
-		System.out.printf("Setup spark with id %d%n", config.id);
 		check(mController.restoreFactoryDefaults(), "factory defaults");
+		if (config instanceof MasterConfig) {
+			var masterConfig = (MasterConfig) config;
+			configureSoftLimit(SoftLimitDirection.kForward, masterConfig.forwardLimit);
+			configureSoftLimit(SoftLimitDirection.kReverse, masterConfig.reverseLimit);
+			mController.setInverted(masterConfig.isInverted);
+			check(mController.setIdleMode(masterConfig.isBraked ? IdleMode.kBrake : IdleMode.kCoast), "idle mode");
+			check(mController.enableVoltageCompensation(masterConfig.voltageCompensation), "voltage compensation");
+			check(mController.setClosedLoopRampRate(masterConfig.ramp), "closed loop ramp");
+			check(mPidController.setP(masterConfig.gains.p, kPidSlotIndex), "p");
+			check(mPidController.setI(masterConfig.gains.i, kPidSlotIndex), "i");
+			check(mPidController.setD(masterConfig.gains.d, kPidSlotIndex), "d");
+			check(mPidController.setFF(masterConfig.gains.f, kPidSlotIndex), "f");
+			check(mPidController.setIMaxAccum(masterConfig.gains.iMax, kPidSlotIndex), "i max");
+			check(mPidController.setIZone(masterConfig.gains.iZone, kPidSlotIndex), "i zone");
+			check(mPidController.setOutputRange(masterConfig.minimumOutput, masterConfig.maximumOutput, kPidSlotIndex), "output range");
+			check(mPidController.setSmartMotionAccelStrategy(AccelStrategy.kSCurve, kPidSlotIndex), "strategy");
+			check(mPidController.setSmartMotionMaxVelocity(masterConfig.gains.v, kPidSlotIndex), "max velocity");
+			check(mPidController.setSmartMotionMaxAccel(masterConfig.gains.a, kPidSlotIndex), "max acceleration");
+			check(mPidController.setSmartMotionAllowedClosedLoopError(masterConfig.gains.allowableError, kPidSlotIndex), "allowable error");
+			check(mPidController.setSmartMotionMinOutputVelocity(0.0, kPidSlotIndex), "min velocity");
+			check(mEncoder.setPositionConversionFactor(masterConfig.positionConversion), "position conversion");
+			check(mEncoder.setVelocityConversionFactor(masterConfig.velocityConversion), "velocity conversion");
+			check(mEncoder.setPosition(masterConfig.startingPosition), "starting position");
+		}
 	}
 
 	private void configureSoftLimit(SoftLimitDirection direction, Float configLimit) {

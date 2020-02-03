@@ -1,8 +1,5 @@
 package team8.tuner;
 
-import com.revrobotics.CANError;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -16,7 +13,6 @@ import team8.tuner.controller.Controller.ControlMode;
 import team8.tuner.csv.CSVWriter;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Robot extends TimedRobot {
@@ -38,6 +34,14 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		mPowerDistributionPanel = new PowerDistributionPanel(0);
+//		var mapper = new ObjectMapper();
+//		var generator = new JsonSchemaGenerator(mapper);
+//		try {
+//			JsonSchema schema = generator.generateSchema(Config.class);
+//			System.out.println(mapper.writeValueAsString(schema));
+//		} catch (JsonProcessingException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	@Override
@@ -161,13 +165,8 @@ public class Robot extends TimedRobot {
 		mReference = setPoint;
 	}
 
-	private void configureSoftLimit(CANSparkMax spark, SoftLimitDirection direction, Float configLimit) {
-		var limit = Optional.ofNullable(configLimit);
-		check(spark.enableSoftLimit(direction, limit.isPresent()), "enable soft limit");
-		limit.ifPresent(softLimit -> check(spark.setSoftLimit(direction, softLimit), "set soft limit"));
-	}
-
 	private Controller setupController(SimpleConfig config) {
+		System.out.printf("Setting up %s with id %d%n", config.type, config.id);
 		switch (config.type) {
 			case SPARK:
 				return new Spark(config);
@@ -186,14 +185,6 @@ public class Robot extends TimedRobot {
 		var slave = setupController(config);
 		slave.follow(master);
 		return slave;
-	}
-
-	private void check(CANError error, String name) {
-		if (error != CANError.kOk) {
-			var message = String.format("Failed to set %s! Error: %s", name, error);
-			System.err.println(message);
-			throw new RuntimeException(message);
-		}
 	}
 
 	private void scoldUser() {
