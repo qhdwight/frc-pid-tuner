@@ -1,4 +1,4 @@
-package team8.tuner.csv;
+package team8.tuner.data;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -36,22 +36,22 @@ public class CSVWriter {
 		sTimer.start();
 	}
 
-	private static void addData(String key, Object secondValue, UnaryOperator<StringBuilder> valueCellWriter) {
+	private static void add(String key, Object secondValue, UnaryOperator<StringBuilder> valueCellWriter) {
 		sBuilder.append(key).append(kCommaDeliminator).append(secondValue).append(kCommaDeliminator);
 		valueCellWriter.apply(sBuilder).append(kNewLineSeparator);
 		if (sBuilder.length() > kAllocateSize) write();
 	}
 
-	public static void addData(String key, Object customSecond, Object value) {
-		addData(key, customSecond, builder -> builder.append(value));
+	public static void add(String key, Object customSecond, Object value) {
+		add(key, customSecond, builder -> builder.append(value));
 	}
 
-	public static void addData(String key, Object value) {
-		addData(key, sTimer.get(), builder -> builder.append(value));
+	public static void add(String key, Object value) {
+		add(key, sTimer.get(), builder -> builder.append(value));
 	}
 
-	static void addData(String key, double value) {
-		addData(key, sTimer.get(), builder -> builder.append(value));
+	static void add(String key, double value) {
+		add(key, sTimer.get(), builder -> builder.append(value));
 	}
 
 	public static void write() {

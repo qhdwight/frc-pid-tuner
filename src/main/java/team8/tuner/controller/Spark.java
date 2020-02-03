@@ -23,13 +23,14 @@ public class Spark extends ControllerBase<CANSparkMax> {
 		mPidController = mController.getPIDController();
 		mEncoder = mController.getEncoder();
 		check(mController.restoreFactoryDefaults(), "factory defaults");
+		check(mController.setIdleMode(config.isBraked ? IdleMode.kBrake : IdleMode.kCoast), "idle mode");
 		if (config instanceof MasterConfig) {
 			var masterConfig = (MasterConfig) config;
 			configureSoftLimit(SoftLimitDirection.kForward, masterConfig.forwardLimit);
 			configureSoftLimit(SoftLimitDirection.kReverse, masterConfig.reverseLimit);
 			mController.setInverted(masterConfig.isInverted);
-			check(mController.setIdleMode(masterConfig.isBraked ? IdleMode.kBrake : IdleMode.kCoast), "idle mode");
 			check(mController.enableVoltageCompensation(masterConfig.voltageCompensation), "voltage compensation");
+			check(mController.setOpenLoopRampRate(masterConfig.ramp), "open loop ramp");
 			check(mController.setClosedLoopRampRate(masterConfig.ramp), "closed loop ramp");
 			check(mPidController.setP(masterConfig.gains.p, kPidSlotIndex), "p");
 			check(mPidController.setI(masterConfig.gains.i, kPidSlotIndex), "i");
@@ -117,7 +118,7 @@ public class Spark extends ControllerBase<CANSparkMax> {
 	}
 
 	@Override
-	public double getAppliedOutput() {
+	public double getAppliedPercentOutput() {
 		return mController.getAppliedOutput();
 	}
 }

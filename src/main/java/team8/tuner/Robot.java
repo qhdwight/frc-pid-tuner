@@ -10,7 +10,8 @@ import team8.tuner.config.Config;
 import team8.tuner.config.Config.SimpleConfig;
 import team8.tuner.controller.*;
 import team8.tuner.controller.Controller.ControlMode;
-import team8.tuner.csv.CSVWriter;
+import team8.tuner.data.CSVWriter;
+import team8.tuner.data.LiveGraph;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,18 +76,24 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testPeriodic() {
 		handleInput();
-		periodicCsvData();
+		periodicData();
 		applyOutputs();
 	}
 
-	private void periodicCsvData() {
+	private void periodicData() {
 		if (mConfig.writeCsv) {
-			CSVWriter.addData("totalCurrent", mPowerDistributionPanel.getTotalCurrent());
-			CSVWriter.addData("controllerCurrent", mMaster.getOutputCurrent() + mSlaves.stream().mapToDouble(Controller::getOutputCurrent).sum());
-			CSVWriter.addData("output", mMaster.getAppliedOutput());
-			CSVWriter.addData("position", mMaster.getPosition());
-			CSVWriter.addData("velocity", mMaster.getVelocity());
+			logData("totalPdpCurrent", mPowerDistributionPanel.getTotalCurrent());
+			logData("totalControllerCurrent", mMaster.getOutputCurrent() + mSlaves.stream().mapToDouble(Controller::getOutputCurrent).sum());
+			logData("reference", mReference);
+			logData("output", mMaster.getAppliedPercentOutput());
+			logData("position", mMaster.getPosition());
+			logData("velocity", mMaster.getVelocity());
 		}
+	}
+
+	private void logData(String name, double data) {
+		CSVWriter.add(name, data);
+		LiveGraph.add(name, data);
 	}
 
 	private void applyOutputs() {
@@ -140,7 +147,8 @@ public class Robot extends TimedRobot {
 			mControlMode = ControlMode.DISABLED;
 			System.out.println("Disabling...");
 		} else {
-			double percentOutInput = -mInput.getY(Hand.kLeft) * kPercentOutputMultiplier;
+			double inputThrottle = -mInput.getY(Hand.kLeft);
+			double percentOutInput = inputThrottle * kPercentOutputMultiplier;
 			if (Math.abs(percentOutInput) > kDeadBand) {
 				mControlMode = ControlMode.PERCENT_OUTPUT;
 				mReference = percentOutInput - Math.signum(percentOutInput) * kDeadBand;
@@ -156,7 +164,11 @@ public class Robot extends TimedRobot {
 				mReference = 0.0;
 			}
 		}
-		if (mInput.getStartButton())
+		if (mInput.getStartButtonPressed())
+			mExtendSolenoid = true;
+		else if (mInput.getBackButtonPressed())
+			mExtendSolenoid = false;
+		else if (mInput.getRawButtonPressed(12)) // TOD: get xbox button id
 			mExtendSolenoid = !mExtendSolenoid;
 	}
 

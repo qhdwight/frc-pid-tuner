@@ -17,6 +17,7 @@ public class Config extends ConfigBase {
 		public ControllerType type;
 		public int id;
 		public boolean isInverted;
+		public boolean isBraked = true;
 	}
 
 	public static class MasterConfig extends SimpleConfig {
@@ -29,7 +30,6 @@ public class Config extends ConfigBase {
 		public double minimumOutput = -1.0, maximumOutput = 1.0;
 		public double startingPosition;
 		public Float forwardLimit, reverseLimit;
-		public boolean isBraked = true;
 	}
 
 	public MasterConfig master;

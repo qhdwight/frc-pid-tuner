@@ -1,6 +1,6 @@
 {
 	"master": {
-		"id": 1,
+		"id": 10,
 		"type": "SPARK",
 		"positionConversion": 1.0,
 		"velocityConversion": 1.0,
@@ -18,7 +18,7 @@
 	},
 	"slaves": [
 		{
-			"id": 16,
+			"id": 11,
 			"type": "SPARK"
 		}
 	],

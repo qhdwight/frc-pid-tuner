@@ -1,6 +1,6 @@
 {
 	"master": {
-		"id": 1,
+		"id": 14,
 		"type": "SPARK",
 		"positionConversion": 1.0,
 		"velocityConversion": 1.0,
@@ -16,12 +16,6 @@
 		"ramp": 0.1,
 		"isInverted": false
 	},
-	"slaves": [
-		{
-			"id": 16,
-			"type": "SPARK"
-		}
-	],
 	"xboxId": 2,
 	"aSetPoint": 0.0,
 	"bSetPoint": 0.0,

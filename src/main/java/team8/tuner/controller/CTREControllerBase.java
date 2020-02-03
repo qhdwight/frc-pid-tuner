@@ -18,13 +18,15 @@ public abstract class CTREControllerBase<TController extends BaseMotorController
 		super(config.id);
 		mController = controllerFactory().apply(config.id);
 		check(mController.configFactoryDefault(kTimeout), "factory defaults");
+		mController.setNeutralMode(config.isBraked ? NeutralMode.Brake : NeutralMode.Coast);
 		if (config instanceof MasterConfig) {
 			var masterConfig = (MasterConfig) config;
 			configForwardSoftLimit(masterConfig.forwardLimit);
 			configReverseSoftLimit(masterConfig.reverseLimit);
 			mController.setInverted(masterConfig.isInverted);
-			mController.setNeutralMode(masterConfig.isBraked ? NeutralMode.Brake : NeutralMode.Coast);
+			mController.enableVoltageCompensation(true);
 			check(mController.configVoltageCompSaturation(masterConfig.voltageCompensation, kTimeout), "voltage compensation");
+			check(mController.configOpenloopRamp(masterConfig.ramp), "open loop ramp");
 			check(mController.configClosedloopRamp(masterConfig.ramp), "closed loop ramp");
 			check(mController.config_kP(kPidSlotIndex, masterConfig.gains.p, kTimeout), "p");
 			check(mController.config_kI(kPidSlotIndex, masterConfig.gains.i, kTimeout), "i");
@@ -92,7 +94,7 @@ public abstract class CTREControllerBase<TController extends BaseMotorController
 	}
 
 	@Override
-	public double getAppliedOutput() {
+	public double getAppliedPercentOutput() {
 		return mController.getMotorOutputPercent();
 	}
 }

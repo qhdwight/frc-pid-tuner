@@ -16,5 +16,5 @@ public interface Controller {
 
 	double getVelocity();
 
-	double getAppliedOutput();
+	double getAppliedPercentOutput();
 }
