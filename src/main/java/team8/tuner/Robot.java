@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class Robot extends TimedRobot {
 
 	public static final int kPidSlotIndex = 0;
-	public static final double kPercentOutputMultiplier = 0.4, kVelocityMultiplier = 0.7, kPercentOutputRun = 0.2;
+	public static final double kPercentOutputMultiplier = 0.9, kVelocityMultiplier = 0.9;
 	private static final double kDeadBand = 0.08;
 	private Config mConfig;
 	private Controller mMaster;
@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testInit() {
 		CSVWriter.init();
-		mConfig = C.read(Config.class);
+		mConfig = C.read(Config.class, "Drive");
 		applyConfig();
 	}
 
@@ -141,7 +141,7 @@ public class Robot extends TimedRobot {
 			setSetPoint(mConfig.ySetPoint);
 		} else if (mInput.getBumperPressed(Hand.kRight)) {
 			mControlMode = ControlMode.PERCENT_OUTPUT;
-			mReference = kPercentOutputRun + mConfig.master.gains.ff;
+			mReference = mConfig.percentOutputRun + mConfig.master.gains.ff;
 			mRunningConstantPercentOutput = true;
 		} else if (mInput.getBumperPressed(Hand.kLeft)) {
 			mControlMode = ControlMode.DISABLED;
@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
 			mExtendSolenoid = true;
 		else if (mInput.getBackButtonPressed())
 			mExtendSolenoid = false;
-		else if (mInput.getRawButtonPressed(12)) // TOD: get xbox button id
+		else if (mInput.getRawButtonPressed(12)) // TODO: get xbox button id
 			mExtendSolenoid = !mExtendSolenoid;
 	}
 

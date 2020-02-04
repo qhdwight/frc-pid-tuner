@@ -38,4 +38,5 @@ public class Config extends ConfigBase {
 	public int xboxId;
 	public boolean writeCsv = true;
 	public double aSetPoint, bSetPoint, xSetPoint, ySetPoint;
+	public double percentOutputRun = 0.6;
 }
