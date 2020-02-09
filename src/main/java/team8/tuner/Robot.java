@@ -1,15 +1,16 @@
 package team8.tuner;
 
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import team8.tuner.config.C;
 import team8.tuner.config.Config;
 import team8.tuner.config.Config.SimpleConfig;
 import team8.tuner.controller.*;
+import team8.tuner.controller.Controller;
 import team8.tuner.controller.Controller.ControlMode;
+import team8.tuner.controller.Spark;
+import team8.tuner.controller.Talon;
+import team8.tuner.controller.Victor;
 import team8.tuner.data.CSVWriter;
 import team8.tuner.data.LiveGraph;
 
@@ -29,12 +30,13 @@ public class Robot extends TimedRobot {
 	private PowerDistributionPanel mPowerDistributionPanel;
 	private double mReference;
 	private boolean mRunningConstantPercentOutput;
-	private boolean mExtendSolenoid;
+	private boolean mExtendSolenoid, mEnableCompressor = true;
 	private ControlMode mControlMode = ControlMode.DISABLED;
+	private Compressor mCompressor = new Compressor();
 
 	@Override
 	public void robotInit() {
-		mPowerDistributionPanel = new PowerDistributionPanel(0);
+		mPowerDistributionPanel = new PowerDistributionPanel();
 //		var mapper = new ObjectMapper();
 //		var generator = new JsonSchemaGenerator(mapper);
 //		try {
@@ -58,7 +60,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testInit() {
 		CSVWriter.init();
-		mConfig = C.read(Config.class, "Config");
+		mConfig = C.read(Config.class, "Indexer");
 		applyConfig();
 	}
 
@@ -120,12 +122,21 @@ public class Robot extends TimedRobot {
 				solenoid.set(mExtendSolenoid);
 			}
 		}
+		if (mEnableCompressor) {
+			mCompressor.start();
+		} else {
+			mCompressor.stop();
+		}
 	}
 
 	@Override
 	public void disabledInit() {
 		mControlMode = ControlMode.DISABLED;
 		mExtendSolenoid = false;
+		mEnableCompressor = true;
+		if (mSolenoids != null) {
+			mSolenoids.forEach(Solenoid::close);
+		}
 		applyOutputs();
 		if (mConfig != null && mConfig.writeCsv) CSVWriter.write();
 	}
@@ -157,14 +168,17 @@ public class Robot extends TimedRobot {
 			} else if (Math.abs(velocityInput) > kDeadBand) {
 				mControlMode = ControlMode.SMART_VELOCITY;
 				mReference = (velocityInput - Math.signum(velocityInput) * kDeadBand) * mConfig.master.gains.v;
+				mRunningConstantPercentOutput = false;
 			} else {
-				if (!mRunningConstantPercentOutput) mReference = 0.0;
+				if (!mRunningConstantPercentOutput) {
+					mControlMode = ControlMode.DISABLED;
+				}
 			}
 		}
 		if (mInput.getStartButtonPressed())
-			mExtendSolenoid = true;
+			mExtendSolenoid = !mExtendSolenoid;
 		else if (mInput.getBackButtonPressed())
-			mExtendSolenoid = false;
+			mEnableCompressor = !mEnableCompressor;
 	}
 
 	private void setSetPoint(double setPoint) {

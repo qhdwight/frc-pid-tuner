@@ -16,6 +16,9 @@
 		"ramp": 0.1,
 		"isInverted": false
 	},
+	"solenoidId": [
+		0
+	],
 	"xboxId": 2,
 	"aSetPoint": 0.0,
 	"bSetPoint": 0.0,
