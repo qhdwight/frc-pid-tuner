@@ -1,11 +1,9 @@
 package team8.tuner.controller;
 
 import com.ctre.phoenix.ErrorCode;
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
-import com.revrobotics.ControlType;
 import team8.tuner.config.Config.MasterConfig;
 import team8.tuner.config.Config.SimpleConfig;
 
@@ -72,11 +70,10 @@ public abstract class CTREControllerBase<TController extends BaseMotorController
 	}
 
 	@Override
-	public void follow(Controller master) {
+	public void follow(Controller master, boolean isInverted) {
 		try {
 			var masterCtre = (CTREControllerBase<? extends BaseMotorController>) master;
 			mController.follow(masterCtre.mController);
-			System.out.println("Following that biatch");
 		} catch (Exception exception) {
 			throw new RuntimeException("Could not follow!", exception);
 		}

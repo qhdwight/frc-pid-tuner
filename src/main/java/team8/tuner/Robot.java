@@ -122,11 +122,12 @@ public class Robot extends TimedRobot {
 				solenoid.set(mExtendSolenoid);
 			}
 		}
-		if (mEnableCompressor) {
-			mCompressor.start();
-		} else {
-			mCompressor.stop();
-		}
+//		if (mEnableCompressor) {
+//			mCompressor.start();
+//		} else {
+//			mCompressor.stop();
+//		}
+		mCompressor.stop();
 	}
 
 	@Override
@@ -204,7 +205,7 @@ public class Robot extends TimedRobot {
 
 	private Controller setupSlave(SimpleConfig config, Controller master) {
 		var slave = setupController(config);
-		slave.follow(master);
+		slave.follow(master, config.isInverted);
 		return slave;
 	}
 

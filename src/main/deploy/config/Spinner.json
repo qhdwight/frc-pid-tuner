@@ -1,7 +1,7 @@
 {
 	"master": {
 		"type": "TALON",
-		"id": 16,
+		"id": 6,
 		"positionConversion": 1.0,
 		"velocityConversion": 1.0,
 		"gains": {
@@ -16,16 +16,6 @@
 		"ramp": 0.1,
 		"isInverted": false
 	},
-	"slaves": [
-		{
-			"type": "VICTOR",
-			"id": 1
-		},
-		{
-			"type": "VICTOR",
-			"id": 2
-		}
-	],
 	"xboxId": 2,
 	"aSetPoint": 0.0,
 	"bSetPoint": 0.0,

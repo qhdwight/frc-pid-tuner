@@ -6,7 +6,7 @@ public interface Controller {
 		DISABLED, SMART_MOTION, SMART_VELOCITY, PERCENT_OUTPUT
 	}
 
-	void follow(Controller master);
+	void follow(Controller master, boolean isInverted);
 
 	void setOutput(ControlMode controlMode, double reference, double arbitraryFeedForward);
 

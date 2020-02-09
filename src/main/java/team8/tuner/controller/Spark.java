@@ -70,10 +70,10 @@ public class Spark extends ControllerBase<CANSparkMax> {
 	}
 
 	@Override
-	public void follow(Controller master) {
+	public void follow(Controller master, boolean isInverted) {
 		try {
 			var masterSpark = (Spark) master;
-			mController.follow(masterSpark.mController);
+			mController.follow(masterSpark.mController, isInverted);
 		} catch (Exception exception) {
 			throw new RuntimeException("Could not follow!", exception);
 		}
