@@ -14,7 +14,7 @@ import java.util.function.UnaryOperator;
 public class CSVWriter {
 
 	private static final String kCommaDeliminator = ",", kNewLineSeparator = "\n";
-	private static final int kAllocateSize = 20000;
+	private static final int kAllocateSize = 40000;
 	private static final String kFileName = "canlog.csv";
 
 	private static final Path sCsvFile = RobotBase.isReal()

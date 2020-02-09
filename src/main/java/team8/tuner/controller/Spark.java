@@ -75,7 +75,7 @@ public class Spark extends ControllerBase<CANSparkMax> {
 			var masterSpark = (Spark) master;
 			mController.follow(masterSpark.mController);
 		} catch (Exception exception) {
-			exception.printStackTrace();
+			throw new RuntimeException("Could not follow!", exception);
 		}
 	}
 

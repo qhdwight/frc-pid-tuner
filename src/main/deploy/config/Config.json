@@ -1,0 +1,34 @@
+{
+	"master": {
+		"type": "TALON",
+		"id": 16,
+		"positionConversion": 1.0,
+		"velocityConversion": 1.0,
+		"gains": {
+			"ff": 0.0,
+			"f": 0.0,
+			"p": 0.0,
+			"d": 0.0,
+			"a": 0.0,
+			"v": 0.0,
+			"allowableError": 0.0
+		},
+		"ramp": 0.1,
+		"isInverted": false
+	},
+	"slaves": [
+		{
+			"type": "VICTOR",
+			"id": 1
+		},
+		{
+			"type": "VICTOR",
+			"id": 2
+		}
+	],
+	"xboxId": 2,
+	"aSetPoint": 0.0,
+	"bSetPoint": 0.0,
+	"xSetPoint": 0.0,
+	"ySetPoint": 0.0
+}

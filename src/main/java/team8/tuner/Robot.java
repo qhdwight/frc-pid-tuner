@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testInit() {
 		CSVWriter.init();
-		mConfig = C.read(Config.class, "Drive");
+		mConfig = C.read(Config.class, "Config");
 		applyConfig();
 	}
 
@@ -145,31 +145,26 @@ public class Robot extends TimedRobot {
 			mRunningConstantPercentOutput = true;
 		} else if (mInput.getBumperPressed(Hand.kLeft)) {
 			mControlMode = ControlMode.DISABLED;
+			mRunningConstantPercentOutput = false;
 			System.out.println("Disabling...");
 		} else {
-			double inputThrottle = -mInput.getY(Hand.kLeft);
-			double percentOutInput = inputThrottle * kPercentOutputMultiplier;
+			double percentOutInput = -mInput.getY(Hand.kLeft) * kPercentOutputMultiplier;
+			double velocityInput = -mInput.getY(Hand.kRight) * kVelocityMultiplier;
 			if (Math.abs(percentOutInput) > kDeadBand) {
 				mControlMode = ControlMode.PERCENT_OUTPUT;
 				mReference = percentOutInput - Math.signum(percentOutInput) * kDeadBand;
 				mRunningConstantPercentOutput = false;
-			} else {
-				if (!mRunningConstantPercentOutput) mReference = 0.0;
-			}
-			double velocityInput = -mInput.getY(Hand.kRight) * kVelocityMultiplier;
-			if (Math.abs(velocityInput) > kDeadBand) {
+			} else if (Math.abs(velocityInput) > kDeadBand) {
 				mControlMode = ControlMode.SMART_VELOCITY;
 				mReference = (velocityInput - Math.signum(velocityInput) * kDeadBand) * mConfig.master.gains.v;
 			} else {
-				mReference = 0.0;
+				if (!mRunningConstantPercentOutput) mReference = 0.0;
 			}
 		}
 		if (mInput.getStartButtonPressed())
 			mExtendSolenoid = true;
 		else if (mInput.getBackButtonPressed())
 			mExtendSolenoid = false;
-		else if (mInput.getRawButtonPressed(12)) // TODO: get xbox button id
-			mExtendSolenoid = !mExtendSolenoid;
 	}
 
 	private void setSetPoint(double setPoint) {

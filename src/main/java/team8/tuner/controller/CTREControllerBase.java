@@ -1,8 +1,11 @@
 package team8.tuner.controller;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.revrobotics.ControlType;
 import team8.tuner.config.Config.MasterConfig;
 import team8.tuner.config.Config.SimpleConfig;
 
@@ -72,15 +75,33 @@ public abstract class CTREControllerBase<TController extends BaseMotorController
 	public void follow(Controller master) {
 		try {
 			var masterCtre = (CTREControllerBase<? extends BaseMotorController>) master;
-			masterCtre.mController.follow(mController);
+			mController.follow(masterCtre.mController);
+			System.out.println("Following that biatch");
 		} catch (Exception exception) {
-			exception.printStackTrace();
+			throw new RuntimeException("Could not follow!", exception);
 		}
 	}
 
 	@Override
 	public void setOutput(ControlMode controlMode, double reference, double arbitraryFeedForward) {
-
+		com.ctre.phoenix.motorcontrol.ControlMode controlType;
+		switch (controlMode) {
+			case DISABLED:
+				controlType = com.ctre.phoenix.motorcontrol.ControlMode.Disabled;
+				break;
+			case PERCENT_OUTPUT:
+				controlType = com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput;
+				break;
+			case SMART_MOTION:
+				controlType = com.ctre.phoenix.motorcontrol.ControlMode.MotionMagic;
+				break;
+			case SMART_VELOCITY:
+				controlType = com.ctre.phoenix.motorcontrol.ControlMode.MotionProfile;
+				break;
+			default:
+				throw new IllegalStateException("Unknown control mode!");
+		}
+		mController.set(controlType, reference, DemandType.ArbitraryFeedForward, arbitraryFeedForward);
 	}
 
 	@Override
