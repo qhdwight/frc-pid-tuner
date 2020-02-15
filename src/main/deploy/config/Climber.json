@@ -2,8 +2,8 @@
 	"master": {
 		"id": 15,
 		"type": "SPARK",
-		"positionConversion": 1.0,
-		"velocityConversion": 1.0,
+		"positionConversion": 0.7363107767,
+		"velocityConversion": 0.7363107767,
 		"gains": {
 			"ff": 0.0,
 			"f": 0.0,
@@ -14,7 +14,7 @@
 			"allowableError": 0.0
 		},
 		"ramp": 0.1,
-		"isInverted": false
+		"isInverted": true
 	},
 	"xboxId": 2,
 	"aSetPoint": 0.0,

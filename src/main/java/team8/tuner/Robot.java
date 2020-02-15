@@ -1,5 +1,8 @@
 package team8.tuner;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.SparkMax;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import team8.tuner.config.C;
@@ -18,6 +21,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Robot extends TimedRobot {
+
+	//========================================================//
+	public static final String kConfigFileName = "Drive";
+	//========================================================//
 
 	public static final int kPidSlotIndex = 0;
 	public static final double kPercentOutputMultiplier = 0.9, kVelocityMultiplier = 0.9;
@@ -60,7 +67,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testInit() {
 		CSVWriter.init();
-		mConfig = C.read(Config.class, "Indexer");
+		mConfig = C.read(Config.class, kConfigFileName);
 		applyConfig();
 	}
 

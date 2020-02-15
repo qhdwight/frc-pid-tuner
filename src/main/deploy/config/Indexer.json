@@ -6,15 +6,17 @@
 		"velocityConversion": 1.0,
 		"gains": {
 			"ff": 0.0,
-			"f": 0.0,
-			"p": 0.0,
+			"f": 0.0003,
+			"p": 0.00032,
 			"d": 0.0,
 			"a": 0.0,
-			"v": 0.0,
+			"v": 900.0,
 			"allowableError": 0.0
 		},
 		"ramp": 0.1,
-		"isInverted": false
+		"isInverted": true,
+		"minimumOutput": -0.6,
+		"maximumOutput": 0.6
 	},
 	"slaves": [
 		{
@@ -22,6 +24,7 @@
 			"type": "SPARK"
 		}
 	],
+	"percentOutputRun": 0.35,
 	"xboxId": 2,
 	"aSetPoint": 0.0,
 	"bSetPoint": 0.0,

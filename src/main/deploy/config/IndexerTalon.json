@@ -1,0 +1,20 @@
+{
+	"master": {
+		"id": 7,
+		"type": "TALON",
+		"positionConversion": 1.0,
+		"velocityConversion": 1.0,
+		"gains": {
+			"ff": 0.0,
+			"f": 0.0,
+			"p": 0.0,
+			"d": 0.0,
+			"a": 0.0,
+			"v": 0.0,
+			"allowableError": 0.0
+		},
+		"ramp": 0.1,
+		"isInverted": false
+	},
+	"xboxId": 2
+}

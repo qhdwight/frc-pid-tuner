@@ -94,7 +94,7 @@ public class Spark extends ControllerBase<CANSparkMax> {
 				controlType = ControlType.kSmartMotion;
 				break;
 			case SMART_VELOCITY:
-				controlType = ControlType.kSmartVelocity;
+				controlType = ControlType.kVelocity;
 				break;
 			default:
 				throw new IllegalStateException("Unknown control mode!");
