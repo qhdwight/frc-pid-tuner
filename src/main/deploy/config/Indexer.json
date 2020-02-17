@@ -24,7 +24,7 @@
 			"type": "SPARK"
 		}
 	],
-	"percentOutputRun": 0.35,
+	"percentOutputRun": 0.4,
 	"xboxId": 2,
 	"aSetPoint": 0.0,
 	"bSetPoint": 0.0,

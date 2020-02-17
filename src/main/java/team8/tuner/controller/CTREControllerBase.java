@@ -2,6 +2,7 @@ package team8.tuner.controller;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import team8.tuner.config.Config.MasterConfig;
@@ -74,6 +75,7 @@ public abstract class CTREControllerBase<TController extends BaseMotorController
 		try {
 			var masterCtre = (CTREControllerBase<? extends BaseMotorController>) master;
 			mController.follow(masterCtre.mController);
+			mController.setInverted(isInverted ? InvertType.OpposeMaster : InvertType.FollowMaster);
 		} catch (Exception exception) {
 			throw new RuntimeException("Could not follow!", exception);
 		}
