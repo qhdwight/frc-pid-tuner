@@ -26,6 +26,7 @@ public abstract class CTREControllerBase<TController extends BaseMotorController
 			configForwardSoftLimit(masterConfig.forwardLimit);
 			configReverseSoftLimit(masterConfig.reverseLimit);
 			mController.setInverted(masterConfig.isInverted);
+			mController.setSensorPhase(masterConfig.isSensorInverted);
 			mController.enableVoltageCompensation(true);
 			check(mController.configVoltageCompSaturation(masterConfig.voltageCompensation, kTimeout), "voltage compensation");
 			check(mController.configOpenloopRamp(masterConfig.ramp), "open loop ramp");

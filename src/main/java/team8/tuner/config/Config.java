@@ -16,7 +16,7 @@ public class Config extends ConfigBase {
 	public static class SimpleConfig {
 		public ControllerType type;
 		public int id;
-		public boolean isInverted;
+		public boolean isInverted, isSensorInverted;
 		public boolean isBraked = true;
 	}
 

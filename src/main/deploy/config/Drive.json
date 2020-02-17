@@ -2,18 +2,17 @@
 	"master": {
 		"id": 2,
 		"type": "FALCON",
-		"positionConversion": 0.00001893605645,
-		"velocityConversion": 0.0001893605645,
 		"gains": {
 			"ff": 0.0,
-			"f": 0.0,
+			"f": 0.04781863509,
 			"p": 0.0,
 			"d": 0.0,
 			"a": 0.0,
-			"v": 0.0,
+			"v": 12836.0,
 			"allowableError": 0.0
 		},
 		"isInverted": true,
+		"isSensorInverted": true,
 		"ramp": 0.1
 	},
 	"slaves": [

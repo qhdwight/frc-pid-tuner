@@ -1,29 +1,31 @@
 package team8.tuner;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.SparkMax;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import team8.tuner.config.C;
 import team8.tuner.config.Config;
 import team8.tuner.config.Config.SimpleConfig;
-import team8.tuner.controller.*;
 import team8.tuner.controller.Controller;
 import team8.tuner.controller.Controller.ControlMode;
 import team8.tuner.controller.Spark;
 import team8.tuner.controller.Talon;
 import team8.tuner.controller.Victor;
+import team8.tuner.controller.*;
 import team8.tuner.data.CSVWriter;
 import team8.tuner.data.LiveGraph;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Robot extends TimedRobot {
 
 	//========================================================//
-	public static final String kConfigFileName = "Drive";
+	public static final String kConfigFileName = "Climber";
 	//========================================================//
 
 	public static final int kPidSlotIndex = 0;
@@ -44,14 +46,16 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		mPowerDistributionPanel = new PowerDistributionPanel();
-//		var mapper = new ObjectMapper();
-//		var generator = new JsonSchemaGenerator(mapper);
-//		try {
-//			JsonSchema schema = generator.generateSchema(Config.class);
-//			System.out.println(mapper.writeValueAsString(schema));
-//		} catch (JsonProcessingException e) {
-//			e.printStackTrace();
-//		}
+		if (RobotBase.isSimulation()) {
+			var mapper = new ObjectMapper();
+			var generator = new JsonSchemaGenerator(mapper);
+			try {
+				JsonSchema schema = generator.generateSchema(Config.class);
+				mapper.writerWithDefaultPrettyPrinter().writeValue(new File("schema.json"), schema);
+			} catch (IOException schemaGenerationException) {
+				schemaGenerationException.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -69,6 +73,7 @@ public class Robot extends TimedRobot {
 		CSVWriter.init();
 		mConfig = C.read(Config.class, kConfigFileName);
 		applyConfig();
+		LiveGraph.add("isEnabled", true);
 	}
 
 	private void applyConfig() {
@@ -147,6 +152,7 @@ public class Robot extends TimedRobot {
 		}
 		applyOutputs();
 		if (mConfig != null && mConfig.writeCsv) CSVWriter.write();
+		LiveGraph.add("isEnabled", false);
 	}
 
 	private void handleInput() {
