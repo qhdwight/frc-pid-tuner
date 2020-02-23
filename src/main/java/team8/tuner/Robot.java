@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class Robot extends TimedRobot {
 
 	//========================================================//
-	public static final String kConfigFileName = "Climber";
+	public static final String kConfigFileName = "Spinner";
 	//========================================================//
 
 	public static final int kPidSlotIndex = 0;
@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
 	private XboxController mInput;
 	private PowerDistributionPanel mPowerDistributionPanel;
 	private double mReference;
-	private boolean mRunningConstantPercentOutput;
+	private boolean mRunningNonTeleop;
 	private boolean mExtendSolenoid, mEnableCompressor = true;
 	private ControlMode mControlMode = ControlMode.DISABLED;
 	private Compressor mCompressor = new Compressor();
@@ -157,20 +157,24 @@ public class Robot extends TimedRobot {
 
 	private void handleInput() {
 		if (mInput.getAButtonPressed()) {
+			mRunningNonTeleop = true;
 			setSetPoint(mConfig.aSetPoint);
 		} else if (mInput.getBButtonPressed()) {
+			mRunningNonTeleop = true;
 			setSetPoint(mConfig.bSetPoint);
 		} else if (mInput.getXButtonPressed()) {
+			mRunningNonTeleop = true;
 			setSetPoint(mConfig.xSetPoint);
 		} else if (mInput.getYButtonPressed()) {
+			mRunningNonTeleop = true;
 			setSetPoint(mConfig.ySetPoint);
 		} else if (mInput.getBumperPressed(Hand.kRight)) {
 			mControlMode = ControlMode.PERCENT_OUTPUT;
 			mReference = mConfig.percentOutputRun + mConfig.master.gains.ff;
-			mRunningConstantPercentOutput = true;
+			mRunningNonTeleop = true;
 		} else if (mInput.getBumperPressed(Hand.kLeft)) {
 			mControlMode = ControlMode.DISABLED;
-			mRunningConstantPercentOutput = false;
+			mRunningNonTeleop = false;
 			System.out.println("Disabling...");
 		} else {
 			double percentOutInput = -mInput.getY(Hand.kLeft) * kPercentOutputMultiplier;
@@ -178,13 +182,13 @@ public class Robot extends TimedRobot {
 			if (Math.abs(percentOutInput) > kDeadBand) {
 				mControlMode = ControlMode.PERCENT_OUTPUT;
 				mReference = percentOutInput - Math.signum(percentOutInput) * kDeadBand;
-				mRunningConstantPercentOutput = false;
+				mRunningNonTeleop = false;
 			} else if (Math.abs(velocityInput) > kDeadBand) {
 				mControlMode = ControlMode.SMART_VELOCITY;
 				mReference = (velocityInput - Math.signum(velocityInput) * kDeadBand) * mConfig.master.gains.v;
-				mRunningConstantPercentOutput = false;
+				mRunningNonTeleop = false;
 			} else {
-				if (!mRunningConstantPercentOutput) {
+				if (!mRunningNonTeleop) {
 					mControlMode = ControlMode.DISABLED;
 				}
 			}
