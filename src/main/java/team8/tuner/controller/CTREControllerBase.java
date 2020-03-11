@@ -1,6 +1,7 @@
 package team8.tuner.controller;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -96,7 +97,7 @@ public abstract class CTREControllerBase<TController extends BaseMotorController
 				controlType = com.ctre.phoenix.motorcontrol.ControlMode.MotionMagic;
 				break;
 			case SMART_VELOCITY:
-				controlType = com.ctre.phoenix.motorcontrol.ControlMode.MotionProfile;
+				controlType = com.ctre.phoenix.motorcontrol.ControlMode.Velocity;
 				break;
 			default:
 				throw new IllegalStateException("Unknown control mode!");

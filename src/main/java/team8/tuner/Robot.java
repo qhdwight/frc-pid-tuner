@@ -25,12 +25,12 @@ import java.util.stream.Collectors;
 public class Robot extends TimedRobot {
 
 	//========================================================//
-	public static final String kConfigFileName = "Spinner";
+	public static final String kConfigFileName = "Drive";
 	//========================================================//
 
 	public static final int kPidSlotIndex = 0;
 	public static final double kPercentOutputMultiplier = 0.9, kVelocityMultiplier = 0.9;
-	private static final double kDeadBand = 0.08;
+	public static final double kDeadBand = 0.08;
 	private Config mConfig;
 	private Controller mMaster;
 	private List<Controller> mSlaves;
@@ -38,23 +38,26 @@ public class Robot extends TimedRobot {
 	private XboxController mInput;
 	private PowerDistributionPanel mPowerDistributionPanel;
 	private double mReference;
-	private boolean mRunningNonTeleop;
+	private boolean mAutomaticControl;
 	private boolean mExtendSolenoid, mEnableCompressor = true;
 	private ControlMode mControlMode = ControlMode.DISABLED;
-	private Compressor mCompressor = new Compressor();
+	private Compressor mCompressor;
 
 	@Override
 	public void robotInit() {
+		mCompressor = new Compressor();
 		mPowerDistributionPanel = new PowerDistributionPanel();
-		if (RobotBase.isSimulation()) {
-			var mapper = new ObjectMapper();
-			var generator = new JsonSchemaGenerator(mapper);
-			try {
-				JsonSchema schema = generator.generateSchema(Config.class);
-				mapper.writerWithDefaultPrettyPrinter().writeValue(new File("schema.json"), schema);
-			} catch (IOException schemaGenerationException) {
-				schemaGenerationException.printStackTrace();
-			}
+	}
+
+	@Override
+	public void simulationInit() {
+		var mapper = new ObjectMapper();
+		var generator = new JsonSchemaGenerator(mapper);
+		try {
+			JsonSchema schema = generator.generateSchema(Config.class);
+			mapper.writerWithDefaultPrettyPrinter().writeValue(new File("schema.json"), schema);
+		} catch (IOException schemaGenerationException) {
+			schemaGenerationException.printStackTrace();
 		}
 	}
 
@@ -157,24 +160,19 @@ public class Robot extends TimedRobot {
 
 	private void handleInput() {
 		if (mInput.getAButtonPressed()) {
-			mRunningNonTeleop = true;
 			setSetPoint(mConfig.aSetPoint);
 		} else if (mInput.getBButtonPressed()) {
-			mRunningNonTeleop = true;
 			setSetPoint(mConfig.bSetPoint);
 		} else if (mInput.getXButtonPressed()) {
-			mRunningNonTeleop = true;
 			setSetPoint(mConfig.xSetPoint);
 		} else if (mInput.getYButtonPressed()) {
-			mRunningNonTeleop = true;
 			setSetPoint(mConfig.ySetPoint);
 		} else if (mInput.getBumperPressed(Hand.kRight)) {
 			mControlMode = ControlMode.PERCENT_OUTPUT;
 			mReference = mConfig.percentOutputRun + mConfig.master.gains.ff;
-			mRunningNonTeleop = true;
 		} else if (mInput.getBumperPressed(Hand.kLeft)) {
 			mControlMode = ControlMode.DISABLED;
-			mRunningNonTeleop = false;
+			mAutomaticControl = false;
 			System.out.println("Disabling...");
 		} else {
 			double percentOutInput = -mInput.getY(Hand.kLeft) * kPercentOutputMultiplier;
@@ -182,13 +180,13 @@ public class Robot extends TimedRobot {
 			if (Math.abs(percentOutInput) > kDeadBand) {
 				mControlMode = ControlMode.PERCENT_OUTPUT;
 				mReference = percentOutInput - Math.signum(percentOutInput) * kDeadBand;
-				mRunningNonTeleop = false;
+				mAutomaticControl = false;
 			} else if (Math.abs(velocityInput) > kDeadBand) {
 				mControlMode = ControlMode.SMART_VELOCITY;
 				mReference = (velocityInput - Math.signum(velocityInput) * kDeadBand) * mConfig.master.gains.v;
-				mRunningNonTeleop = false;
+				mAutomaticControl = false;
 			} else {
-				if (!mRunningNonTeleop) {
+				if (!mAutomaticControl) {
 					mControlMode = ControlMode.DISABLED;
 				}
 			}
@@ -202,6 +200,7 @@ public class Robot extends TimedRobot {
 	private void setSetPoint(double setPoint) {
 		mControlMode = ControlMode.SMART_MOTION;
 		mReference = setPoint;
+		mAutomaticControl = true;
 	}
 
 	private Controller setupController(SimpleConfig config) {

@@ -13,8 +13,6 @@
 			"v": 3100.0,
 			"allowableError": 0.0
 		},
-		"reverseLimit": 0.0,
-		"forwardLimit": 130.0,
 		"ramp": 0.1,
 		"isInverted": true
 	},

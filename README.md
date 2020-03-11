@@ -1,3 +1,14 @@
+# FRC PID Tuner
+
+## Overview
+
+Allows deployment of any amount of arbitrary speed controllers.
+
+Configs are loaded from JSON each enable session - Variables can be changed quickly without redeploying robot code.
+
+## Example Subsystem (Drive)
+
+```json
 {
 	"master": {
 		"id": 2,
@@ -37,3 +48,12 @@
 	"xSetPoint": 0.0,
 	"ySetPoint": 0.0
 }
+```
+
+Now, the only code that needs to change is in [Robot.java](src/main/java/team8/tuner/Robot.java):
+
+```java
+public static final String kConfigFileName = "Drive";
+```
+
+Adding a new subsystem is as simple as placing it [here](src/main/deploy/config)
