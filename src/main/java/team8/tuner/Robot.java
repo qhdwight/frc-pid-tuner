@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import team8.tuner.config.C;
 import team8.tuner.config.Config;
 import team8.tuner.config.Config.SimpleConfig;
@@ -36,7 +35,7 @@ public class Robot extends TimedRobot {
 	private List<Controller> mSlaves;
 	private List<Solenoid> mSolenoids;
 	private XboxController mInput;
-	private PowerDistributionPanel mPowerDistributionPanel;
+	private PowerDistribution mPowerDistribution;
 	private double mReference;
 	private boolean mAutomaticControl;
 	private boolean mExtendSolenoid, mEnableCompressor = true;
@@ -45,8 +44,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void robotInit() {
-		mCompressor = new Compressor();
-		mPowerDistributionPanel = new PowerDistributionPanel();
+		mCompressor = new Compressor(PneumaticsModuleType.CTREPCM);
+		mPowerDistribution = new PowerDistribution();
 	}
 
 	@Override
@@ -87,7 +86,7 @@ public class Robot extends TimedRobot {
 		mSlaves = mConfig.slaves.stream()
 				.map(slaveConfig -> setupSlave(slaveConfig, mMaster))
 				.collect(Collectors.toUnmodifiableList());
-		mSolenoids = mConfig.solenoidId.stream().map(Solenoid::new).collect(Collectors.toUnmodifiableList());
+		mSolenoids = mConfig.solenoidId.stream().map(solenoidId -> new Solenoid(PneumaticsModuleType.CTREPCM, solenoidId)).collect(Collectors.toUnmodifiableList());
 	}
 
 	@Override
@@ -99,7 +98,7 @@ public class Robot extends TimedRobot {
 
 	private void periodicData() {
 		if (mConfig.writeCsv) {
-			logData("totalPdpCurrent", mPowerDistributionPanel.getTotalCurrent());
+			logData("totalPdpCurrent", mPowerDistribution.getTotalCurrent());
 			logData("totalControllerCurrent", mMaster.getOutputCurrent() + mSlaves.stream().mapToDouble(Controller::getOutputCurrent).sum());
 			logData("reference", mReference);
 			logData("output", mMaster.getAppliedPercentOutput());
@@ -142,7 +141,7 @@ public class Robot extends TimedRobot {
 //		} else {
 //			mCompressor.stop();
 //		}
-		mCompressor.stop();
+		mCompressor.disable();
 	}
 
 	@Override
@@ -167,16 +166,16 @@ public class Robot extends TimedRobot {
 			setSetPoint(mConfig.xSetPoint);
 		} else if (mInput.getYButtonPressed()) {
 			setSetPoint(mConfig.ySetPoint);
-		} else if (mInput.getBumperPressed(Hand.kRight)) {
+		} else if (mInput.getRightBumperPressed()) {
 			mControlMode = ControlMode.PERCENT_OUTPUT;
 			mReference = mConfig.percentOutputRun + mConfig.master.gains.ff;
-		} else if (mInput.getBumperPressed(Hand.kLeft)) {
+		} else if (mInput.getLeftBumperPressed()) {
 			mControlMode = ControlMode.DISABLED;
 			mAutomaticControl = false;
 			System.out.println("Disabling...");
 		} else {
-			double percentOutInput = -mInput.getY(Hand.kLeft) * kPercentOutputMultiplier;
-			double velocityInput = -mInput.getY(Hand.kRight) * kVelocityMultiplier;
+			double percentOutInput = -mInput.getLeftY() * kPercentOutputMultiplier;
+			double velocityInput = -mInput.getRightY() * kVelocityMultiplier;
 			if (Math.abs(percentOutInput) > kDeadBand) {
 				mControlMode = ControlMode.PERCENT_OUTPUT;
 				mReference = percentOutInput - Math.signum(percentOutInput) * kDeadBand;

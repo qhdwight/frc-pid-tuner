@@ -1,10 +1,12 @@
 package team8.tuner.controller;
 
 import com.revrobotics.*;
-import com.revrobotics.CANPIDController.AccelStrategy;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxPIDController.AccelStrategy;
+
 import team8.tuner.config.Config.MasterConfig;
 import team8.tuner.config.Config.SimpleConfig;
 
@@ -15,8 +17,8 @@ import static team8.tuner.Robot.kPidSlotIndex;
 
 public class Spark extends ControllerBase<CANSparkMax> {
 
-	private final CANPIDController mPidController;
-	private final CANEncoder mEncoder;
+	private final SparkMaxPIDController mPidController;
+	private final RelativeEncoder mEncoder;
 
 	public Spark(SimpleConfig config) {
 		super(config.id);
@@ -38,7 +40,7 @@ public class Spark extends ControllerBase<CANSparkMax> {
 			check(mPidController.setFF(masterConfig.gains.f, kPidSlotIndex), "f");
 			check(mPidController.setIMaxAccum(masterConfig.gains.iMax, kPidSlotIndex), "i max");
 			check(mPidController.setIZone(masterConfig.gains.iZone, kPidSlotIndex), "i zone");
-			check(mPidController.setOutputRange(masterConfig.minimumOutput, masterConfig.maximumOutput, kPidSlotIndex), "output range");
+			check(mPidController.setOutputRange(masterConfig.minimumOutput, masterConfig.maximumOutput, kPidSlotIndex),	"output range");
 			check(mPidController.setSmartMotionAccelStrategy(AccelStrategy.kSCurve, kPidSlotIndex), "strategy");
 			check(mPidController.setSmartMotionMaxVelocity(masterConfig.gains.v, kPidSlotIndex), "max velocity");
 			check(mPidController.setSmartMotionMaxAccel(masterConfig.gains.a, kPidSlotIndex), "max acceleration");
@@ -56,8 +58,8 @@ public class Spark extends ControllerBase<CANSparkMax> {
 		limit.ifPresent(softLimit -> check(mController.setSoftLimit(direction, softLimit), "set soft limit"));
 	}
 
-	private void check(CANError error, String name) {
-		if (error != CANError.kOk) {
+	private void check(REVLibError error, String name) {
+		if (error != REVLibError.kOk) {
 			var message = String.format("Failed to set %s! Error: %s", name, error);
 			System.err.println(message);
 			throw new RuntimeException(message);

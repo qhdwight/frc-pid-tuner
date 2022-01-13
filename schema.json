@@ -1,149 +1,149 @@
 {
-	"type" : "object",
-	"id" : "urn:jsonschema:team8:tuner:config:Config",
-	"properties" : {
-		"master" : {
-			"type" : "object",
-			"id" : "urn:jsonschema:team8:tuner:config:Config:MasterConfig",
-			"properties" : {
-				"type" : {
-					"type" : "string",
-					"enum" : [ "SPARK", "FALCON", "TALON", "VICTOR" ]
-				},
-				"id" : {
-					"type" : "integer"
-				},
-				"isInverted" : {
-					"type" : "boolean"
-				},
-				"isSensorInverted" : {
-					"type" : "boolean"
-				},
-				"isBraked" : {
-					"type" : "boolean"
-				},
-				"gains" : {
-					"type" : "object",
-					"id" : "urn:jsonschema:team8:tuner:config:Config:SmartGains",
-					"properties" : {
-						"p" : {
-							"type" : "number"
-						},
-						"i" : {
-							"type" : "number"
-						},
-						"iZone" : {
-							"type" : "number"
-						},
-						"iMax" : {
-							"type" : "number"
-						},
-						"d" : {
-							"type" : "number"
-						},
-						"f" : {
-							"type" : "number"
-						},
-						"ff" : {
-							"type" : "number"
-						},
-						"a" : {
-							"type" : "number"
-						},
-						"v" : {
-							"type" : "number"
-						},
-						"allowableError" : {
-							"type" : "number"
-						}
-					}
-				},
-				"armFf" : {
-					"type" : "number"
-				},
-				"ramp" : {
-					"type" : "number"
-				},
-				"armComOffset" : {
-					"type" : "number"
-				},
-				"voltageCompensation" : {
-					"type" : "number"
-				},
-				"positionConversion" : {
-					"type" : "number"
-				},
-				"velocityConversion" : {
-					"type" : "number"
-				},
-				"minimumOutput" : {
-					"type" : "number"
-				},
-				"maximumOutput" : {
-					"type" : "number"
-				},
-				"startingPosition" : {
-					"type" : "number"
-				},
-				"forwardLimit" : {
-					"type" : "number"
-				},
-				"reverseLimit" : {
-					"type" : "number"
-				}
-			}
-		},
-		"slaves" : {
-			"type" : "array",
-			"items" : {
-				"type" : "object",
-				"id" : "urn:jsonschema:team8:tuner:config:Config:SimpleConfig",
-				"properties" : {
-					"type" : {
-						"type" : "string",
-						"enum" : [ "SPARK", "FALCON", "TALON", "VICTOR" ]
-					},
-					"id" : {
-						"type" : "integer"
-					},
-					"isInverted" : {
-						"type" : "boolean"
-					},
-					"isSensorInverted" : {
-						"type" : "boolean"
-					},
-					"isBraked" : {
-						"type" : "boolean"
-					}
-				}
-			}
-		},
-		"solenoidId" : {
-			"type" : "array",
-			"items" : {
-				"type" : "integer"
-			}
-		},
-		"xboxId" : {
-			"type" : "integer"
-		},
-		"writeCsv" : {
-			"type" : "boolean"
-		},
-		"aSetPoint" : {
-			"type" : "number"
-		},
-		"bSetPoint" : {
-			"type" : "number"
-		},
-		"xSetPoint" : {
-			"type" : "number"
-		},
-		"ySetPoint" : {
-			"type" : "number"
-		},
-		"percentOutputRun" : {
-			"type" : "number"
-		}
-	}
+  "type" : "object",
+  "id" : "urn:jsonschema:team8:tuner:config:Config",
+  "properties" : {
+    "master" : {
+      "type" : "object",
+      "id" : "urn:jsonschema:team8:tuner:config:Config:MasterConfig",
+      "properties" : {
+        "type" : {
+          "type" : "string",
+          "enum" : [ "SPARK", "FALCON", "TALON", "VICTOR" ]
+        },
+        "id" : {
+          "type" : "integer"
+        },
+        "isInverted" : {
+          "type" : "boolean"
+        },
+        "isSensorInverted" : {
+          "type" : "boolean"
+        },
+        "isBraked" : {
+          "type" : "boolean"
+        },
+        "gains" : {
+          "type" : "object",
+          "id" : "urn:jsonschema:team8:tuner:config:Config:SmartGains",
+          "properties" : {
+            "p" : {
+              "type" : "number"
+            },
+            "i" : {
+              "type" : "number"
+            },
+            "iZone" : {
+              "type" : "number"
+            },
+            "iMax" : {
+              "type" : "number"
+            },
+            "d" : {
+              "type" : "number"
+            },
+            "f" : {
+              "type" : "number"
+            },
+            "ff" : {
+              "type" : "number"
+            },
+            "a" : {
+              "type" : "number"
+            },
+            "v" : {
+              "type" : "number"
+            },
+            "allowableError" : {
+              "type" : "number"
+            }
+          }
+        },
+        "armFf" : {
+          "type" : "number"
+        },
+        "ramp" : {
+          "type" : "number"
+        },
+        "armComOffset" : {
+          "type" : "number"
+        },
+        "voltageCompensation" : {
+          "type" : "number"
+        },
+        "positionConversion" : {
+          "type" : "number"
+        },
+        "velocityConversion" : {
+          "type" : "number"
+        },
+        "minimumOutput" : {
+          "type" : "number"
+        },
+        "maximumOutput" : {
+          "type" : "number"
+        },
+        "startingPosition" : {
+          "type" : "number"
+        },
+        "forwardLimit" : {
+          "type" : "number"
+        },
+        "reverseLimit" : {
+          "type" : "number"
+        }
+      }
+    },
+    "slaves" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "id" : "urn:jsonschema:team8:tuner:config:Config:SimpleConfig",
+        "properties" : {
+          "type" : {
+            "type" : "string",
+            "enum" : [ "SPARK", "FALCON", "TALON", "VICTOR" ]
+          },
+          "id" : {
+            "type" : "integer"
+          },
+          "isInverted" : {
+            "type" : "boolean"
+          },
+          "isSensorInverted" : {
+            "type" : "boolean"
+          },
+          "isBraked" : {
+            "type" : "boolean"
+          }
+        }
+      }
+    },
+    "solenoidId" : {
+      "type" : "array",
+      "items" : {
+        "type" : "integer"
+      }
+    },
+    "xboxId" : {
+      "type" : "integer"
+    },
+    "writeCsv" : {
+      "type" : "boolean"
+    },
+    "aSetPoint" : {
+      "type" : "number"
+    },
+    "bSetPoint" : {
+      "type" : "number"
+    },
+    "xSetPoint" : {
+      "type" : "number"
+    },
+    "ySetPoint" : {
+      "type" : "number"
+    },
+    "percentOutputRun" : {
+      "type" : "number"
+    }
+  }
 }
